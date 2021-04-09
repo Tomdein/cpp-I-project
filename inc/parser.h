@@ -16,7 +16,7 @@ namespace paint
         parse_error(const std::string &what_arg, const std::string &error_substring);
 
         virtual const char *what() const noexcept override;
-        virtual char *error_substring() const noexcept;
+        virtual const char *error_substring() const noexcept;
 
     private:
         char error_substring_[256];
