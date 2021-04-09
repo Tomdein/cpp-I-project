@@ -9,12 +9,12 @@ namespace paint
 
     ColorRGB888 ColorRGB565::ToRGB888() const
     {
-        return ColorRGB888(red_ << 3, green_ << 2, blue_ << 3);
+        return ColorRGB888(pixel_.r << 3, pixel_.g << 2, pixel_.b << 3);
     }
 
     ColorRGB565 ColorRGB888::ToRGB565() const
     {
-        return ColorRGB565(red_ >> 3, green_ >> 2, blue_ >> 3);
+        return ColorRGB565(pixel_.r >> 3, pixel_.g >> 2, pixel_.b >> 3);
     }
 
     ColorRGB888 ColorRGB888::ToRGB888() const
