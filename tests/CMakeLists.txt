@@ -4,7 +4,7 @@ include_directories(${PARENT_PATH_OF_GTEST}/googltest/googltest/include)
 # target_include_directories(parse_test PUBLIC "${Paint_SOURCE_DIR}/inc")
 
 add_executable(parse_test "./parser_test.cc")
-add_executable(color_test "./color_test.cc")
+add_executable(color_test "./color_test.cc" "../src/color.cc")
 include_directories("${Paint_SOURCE_DIR}/inc")
 
 # add_test(ParseTest parse_test)

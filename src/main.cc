@@ -49,5 +49,6 @@ int main()
     std::shared_ptr<paint::Color> sp1 = std::make_shared<paint::ColorRGB565>(0, 0, 0);
     sp1->SetColor(*sp);
     paint::ColorRGB565 c(*sp);
+
     std::cout << (typeid(c).hash_code() == typeid(paint::ColorRGB565).hash_code()) << '\n';
 }

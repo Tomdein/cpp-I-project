@@ -2,24 +2,24 @@
 
 namespace paint
 {
-
-    ColorRGB565::operator ColorRGB565() const
+    ColorRGB565 ColorRGB565::ToRGB565() const
     {
-        return *this;
+        return ColorRGB565(*this);
     }
 
-    ColorRGB565::operator ColorRGB888() const
+    ColorRGB888 ColorRGB565::ToRGB888() const
     {
-        return ColorRGB888(red_, green_, blue_);
+        return ColorRGB888(red_ << 3, green_ << 2, blue_ << 3);
     }
 
-    ColorRGB888::operator ColorRGB565() const
+    ColorRGB565 ColorRGB888::ToRGB565() const
     {
         return ColorRGB565(red_ >> 3, green_ >> 2, blue_ >> 3);
     }
 
-    ColorRGB888::operator ColorRGB888() const
+    ColorRGB888 ColorRGB888::ToRGB888() const
     {
-        return *this;
+        return ColorRGB888(*this);
     }
+
 }

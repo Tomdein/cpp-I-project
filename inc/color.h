@@ -15,8 +15,8 @@ namespace paint
         Color() = default;
         virtual ~Color() {}
 
-        virtual explicit operator ColorRGB565() const = 0;
-        virtual explicit operator ColorRGB888() const = 0;
+        virtual ColorRGB565 ToRGB565() const = 0;
+        virtual ColorRGB888 ToRGB888() const = 0;
 
         virtual void SetColor(const Color &other) = 0;
     };
@@ -33,20 +33,22 @@ namespace paint
         virtual ~ColorRGB565() {}
 
         ColorRGB565(const ColorRGB565 &other) : red_(other.red_), green_(other.green_), blue_(other.blue_) {}
+        ColorRGB565(const Color &other) { *this = std::move(other.ToRGB565()); }
         ColorRGB565(ColorRGB565 &&other) : red_(std::exchange(other.red_, 0)), green_(std::exchange(other.green_, 0)), blue_(std::exchange(other.blue_, 0)) {}
 
-        ColorRGB565 &operator=(ColorRGB565 other)
+        // ColorRGB565 &operator=(const Color &other) { return ColorRGB565(std::move(other.ToRGB565())); }
+        ColorRGB565 &operator=(const ColorRGB565 &other) = default;
+        bool operator==(const ColorRGB565 &other) const
         {
-            std::swap(red_, other.red_);
-            std::swap(green_, other.green_);
-            std::swap(blue_, other.blue_);
-            return *this;
+            return red_ == other.red_ &&
+                   green_ == other.green_ &&
+                   blue_ == other.blue_;
         }
 
-        virtual explicit operator ColorRGB565() const override;
-        virtual explicit operator ColorRGB888() const override;
+        virtual ColorRGB565 ToRGB565() const override;
+        virtual ColorRGB888 ToRGB888() const override;
 
-        virtual void SetColor(const Color &other) { *this = static_cast<ColorRGB565>(other); };
+        virtual void SetColor(const Color &other) { *this = std::move(other.ToRGB565()); };
 
     private:
         uint8_t red_;
@@ -66,20 +68,21 @@ namespace paint
         virtual ~ColorRGB888() {}
 
         ColorRGB888(const ColorRGB888 &other) : red_(other.red_), green_(other.green_), blue_(other.blue_) {}
-        ColorRGB888(ColorRGB888 &&other) : red_(std::exchange(other.red_, 0)), green_(std::exchange(other.green_, 0)), blue_(std::exchange(other.blue_, 0)) {}
+        ColorRGB888(const Color &other) { *this = std::move(other.ToRGB888()); }
+        ColorRGB888(ColorRGB888 &&other) = default;
 
-        ColorRGB888 &operator=(ColorRGB888 other)
+        ColorRGB888 &operator=(const ColorRGB888 &other) = default;
+        bool operator==(const ColorRGB888 &other) const
         {
-            std::swap(red_, other.red_);
-            std::swap(green_, other.green_);
-            std::swap(blue_, other.blue_);
-            return *this;
+            return red_ == other.red_ &&
+                   green_ == other.green_ &&
+                   blue_ == other.blue_;
         }
 
-        virtual explicit operator ColorRGB565() const override;
-        virtual explicit operator ColorRGB888() const override;
+        virtual ColorRGB565 ToRGB565() const override;
+        virtual ColorRGB888 ToRGB888() const override;
 
-        virtual void SetColor(const Color &other) { *this = static_cast<ColorRGB888>(other); };
+        virtual void SetColor(const Color &other) { *this = std::move(other.ToRGB888()); };
 
     private:
         uint8_t red_;
