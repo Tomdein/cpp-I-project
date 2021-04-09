@@ -19,8 +19,14 @@ namespace paint
         {
             std::strncpy(error_substring_, error_substring, PARSE_ERROR_SUBSTRING_LEN);
             error_substring_[PARSE_ERROR_SUBSTRING_LEN - 1] = '\0';
-        };
-        parse_error(const std::string &error_substring);
+        }
+
+        parse_error(const std::string &error_substring)
+        {
+            size_t n = error_substring.copy(error_substring_, PARSE_ERROR_SUBSTRING_LEN);
+            error_substring_[n - 1] = '\0';
+        }
+
         virtual ~parse_error() override{};
 
         virtual const char *what() const noexcept override;
