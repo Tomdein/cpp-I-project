@@ -2,7 +2,8 @@
 
 FILE(GLOB SRCFILES *.cc)
 
-add_executable(Paint "./main.cc" "./color.cc")
-# add_executable(Paint $(SRCFILES))
+set(PaintSources ./main.cc ./color.cc ./parser.cc)
+
+add_executable(Paint ${PaintSources})
 
 target_include_directories(Paint PUBLIC "${Paint_SOURCE_DIR}/inc")
