@@ -26,12 +26,7 @@ namespace paint
     class ColorRGB565 : public Color
     {
     public:
-        ColorRGB565(uint8_t red, uint8_t green, uint8_t blue)
-        {
-            pixel_.r = red;
-            pixel_.g = green;
-            pixel_.b = blue;
-        }
+        ColorRGB565(uint8_t red, uint8_t green, uint8_t blue) : pixel_{red, green, blue} {}
         virtual ~ColorRGB565() {}
 
         //ColorRGB565(const ColorRGB565 &other) : pixel_.red(other.pixel_.red), pixel_.green(other.pixel_.green), pixel_.blue(other.pixel_.blue) {}
