@@ -7,6 +7,16 @@
 
 namespace paint
 {
+    const char *parse_error::what() const noexcept
+    {
+        return "Exception while parsing ";
+    }
+
+    const char *parse_error::error_substring() const noexcept
+    {
+        return error_substring_;
+    }
+
     std::shared_ptr<Command> Parser::ParseLine(std::string &line)
     {
         std::smatch match;
@@ -18,7 +28,7 @@ namespace paint
         }
         else if (std::regex_match(line, match, Parser::re_color_))
         {
-            std::make_shared<paint::Command>(paint::ColorCommand(std::move(std::make_shared<paint::Color>(new paint::ColorRGB888(0, 0, 0)))));
+            std::make_shared<paint::Command>(paint::ColorCommand(std::move(std::shared_ptr<paint::Color>(new paint::ColorRGB888(0, 0, 0)))));
         }
         else if (std::regex_match(line, match, Parser::re_line_))
         {
@@ -51,6 +61,6 @@ namespace paint
         {
         }
 
-        throw paint::parse_error("Unable to parse command", line);
+        throw paint::parse_error(line);
     }
 }

@@ -4,22 +4,30 @@
 #include <filesystem>
 #include <regex>
 #include <exception>
+#include <cstring>
 
 #include "command.h"
 
 namespace paint
 {
+#define PARSE_ERROR_SUBSTRING_LEN 256
+
     class parse_error : public std::exception
     {
     public:
-        parse_error(const char *what_arg, const char *error_substring);
-        parse_error(const std::string &what_arg, const std::string &error_substring);
+        parse_error(const char *error_substring)
+        {
+            std::strncpy(error_substring_, error_substring, PARSE_ERROR_SUBSTRING_LEN);
+            error_substring_[PARSE_ERROR_SUBSTRING_LEN - 1] = '\0';
+        };
+        parse_error(const std::string &error_substring);
+        virtual ~parse_error() override{};
 
         virtual const char *what() const noexcept override;
         virtual const char *error_substring() const noexcept;
 
     private:
-        char error_substring_[256];
+        char error_substring_[PARSE_ERROR_SUBSTRING_LEN];
     };
 
     class Parser
@@ -62,42 +70,6 @@ namespace paint
     std::regex Parser::re_redo_ = std::regex("^REDO$", std::regex::ECMAScript);
     std::regex Parser::re_param_delim_ = std::regex(",\\s(?=[^\\{\\}]*\\{[^\\{\\}]*\\}|[^\\{\\}]+$)", std::regex::ECMAScript);
     std::regex Parser::re_param_ = std::regex("^([a-z]*):\\s(.*)$", std::regex::ECMAScript);
-
-    // class FileParser
-    // {
-    // public:
-    //     FileParser(FileParser &other) = delete;
-    //     void operator=(FileParser const &) = delete;
-
-    //     static FileParser &getInstance()
-    //     {
-    //         static FileParser instance;
-    //         return instance;
-    //     }
-
-    //     bool ParseFile();
-
-    // private:
-    //     FileParser() {}
-    // };
-
-    // class CLIParser
-    // {
-    // public:
-    //     CLIParser(CLIParser &other) = delete;
-    //     void operator=(CLIParser const &) = delete;
-
-    //     static CLIParser &getInstance()
-    //     {
-    //         static CLIParser instance;
-    //         return instance;
-    //     }
-
-    //     bool ParseCLI();
-
-    // private:
-    //     CLIParser() {}
-    // };
 
 }
 
