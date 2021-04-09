@@ -1,9 +1,27 @@
+#include <exception>
+
 #include <gtest/gtest.h>
+
 #include "parser.h"
 
-TEST(parser, basic_parse)
+TEST(parser_error, throw_exception)
 {
-    GTEST_ASSERT_EQ(1, 42);
+    try
+    {
+        throw paint::parse_error("ASDFGHJKL");
+    }
+    catch (paint::parse_error &e)
+    {
+        ASSERT_STREQ("ASDFGHJKL", e.error_substring());
+    }
+
+    try
+    {
+        throw paint::parse_error("ASDFGHJKL");
+    }
+    catch (std::exception &e)
+    {
+    }
 }
 
 int main(int argc, char *argv[])
