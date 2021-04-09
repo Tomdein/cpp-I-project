@@ -12,7 +12,7 @@ namespace paint
     public:
         explicit Command(std::string name) : command_name_(name){};
 
-        virtual void Invoke(AbstractImage &im);
+        virtual void Invoke(AbstractImage &im) = 0;
 
         std::string CommandName() const;
 
