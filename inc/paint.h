@@ -3,8 +3,8 @@
 
 #include <filesystem>
 
-#include "parser.h"
 #include "point.h"
+#include "parser.h"
 
 namespace paint
 {

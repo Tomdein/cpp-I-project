@@ -1,7 +1,7 @@
 #ifndef PAINT_INC_POINT_H_
 #define PAINT_INC_POINT_H_
 
-#include "image_data.h"
+//#include "image_data.h"
 #include "unit.h"
 
 namespace paint
@@ -23,7 +23,7 @@ namespace paint
     class PointPX : public BasePoint
     {
     public:
-        PointPX(uint32_t x, uint32_t y) : point_{x = x, y = y} {};
+        PointPX(uint32_t x, uint32_t y) : point_{x, y} {};
 
         virtual Point GetPointPX(const Point &dimensions) override;
 

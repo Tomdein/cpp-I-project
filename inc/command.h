@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "image.h"
+#include "rotation.h"
 
 namespace paint
 {
@@ -12,28 +13,22 @@ namespace paint
     public:
         explicit Command(std::string name) : command_name_(name){};
 
-        virtual void Invoke(AbstractImage &im);
+        virtual void Invoke(AbstractImage &im) = 0;
 
-        std::string CommandName() const;
+        std::string CommandName() const { return command_name_; };
 
     private:
         std::string command_name_;
     };
 
-    enum class Rotation
-    {
-        kClock,
-        kCounterClock,
-    };
-
     class ColorCommand : public Command
     {
     public:
-        explicit ColorCommand(std::shared_ptr<paint::Color> &&color) : Command("ColorCommand"), color_(color){};
+        explicit ColorCommand(std::shared_ptr<Color> &&color) : Command("ColorCommand"), color_(color){};
 
         virtual void Invoke(AbstractImage &im) override
         {
-            im.SetColor(color_);
+            im.SetNextColor(color_);
         };
 
     private:
@@ -53,25 +48,25 @@ namespace paint
 
         // Optional parameters
         std::shared_ptr<Color> line_color_;
-        std::shared_ptr<BaseUnit> line_width_;
+        Unit line_width_;
     };
 
     class CircleCommand : public Command
     {
     public:
-        explicit CircleCommand(std::string name) : Command(name){};
+        explicit CircleCommand() : Command("CircleCommand"){};
 
         virtual void Invoke(AbstractImage &im) override { im.DrawCircle(); };
 
     private:
         std::shared_ptr<BasePoint> center_;
-        std::shared_ptr<BaseUnit> raduis_;
+        Unit raduis_;
 
         // Optional parameters
         bool fill_ = false; // Set fill_ to false as default
         std::shared_ptr<Color> fill_color_;
         std::shared_ptr<Color> border_color_;
-        std::shared_ptr<BaseUnit> border_width_;
+        Unit border_width_;
     };
 
     class BucketCommand : public Command
