@@ -9,6 +9,8 @@ add_executable(parse_test "./parser_test.cc" ${PaintSources})
 add_executable(color_test "./color_test.cc" ${PaintSources})
 include_directories("${Paint_SOURCE_DIR}/inc")
 
+# set_target_properties(parse_test color_test PROPERTIES EXCLUDE_FROM_ALL 1)
+
 # add_test(ParseTest parse_test)
 include(GoogleTest)
 gtest_discover_tests(parse_test)

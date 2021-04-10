@@ -26,6 +26,7 @@ namespace paint
     class ColorRGB565 : public Color
     {
     public:
+        ColorRGB565() = default;
         ColorRGB565(uint8_t red, uint8_t green, uint8_t blue) : pixel_{red, green, blue} {}
         virtual ~ColorRGB565() {}
 
@@ -42,6 +43,14 @@ namespace paint
         virtual ColorRGB888 ToRGB888() const override;
 
         virtual void SetColor(const Color &other) { *this = std::move(other.ToRGB565()); };
+        void SetColor(uint8_t red, uint8_t green, uint8_t blue)
+        {
+            pixel_.r = red;
+            pixel_.g = green;
+            pixel_.b = blue;
+        }
+
+        PixelRGB565 GetData() { return pixel_; }
 
     private:
         PixelRGB565 pixel_;
@@ -50,6 +59,7 @@ namespace paint
     class ColorRGB888 : public Color
     {
     public:
+        ColorRGB888() = default;
         ColorRGB888(uint8_t red, uint8_t green, uint8_t blue) : pixel_{red, green, blue} {}
         virtual ~ColorRGB888() {}
 
@@ -64,6 +74,14 @@ namespace paint
         virtual ColorRGB888 ToRGB888() const override;
 
         virtual void SetColor(const Color &other) { *this = std::move(other.ToRGB888()); };
+        void SetColor(uint8_t red, uint8_t green, uint8_t blue)
+        {
+            pixel_.r = red;
+            pixel_.g = green;
+            pixel_.b = blue;
+        }
+
+        PixelRGB888 GetData() { return pixel_; }
 
     private:
         PixelRGB888 pixel_;

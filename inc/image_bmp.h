@@ -5,6 +5,8 @@
 
 namespace paint
 {
+
+    template <class T>
     class ImageBMP : AbstractImage
     {
     public:

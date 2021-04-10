@@ -13,7 +13,7 @@ namespace paint
     class AbstractImage
     {
     public:
-        void SetColor(std::shared_ptr<paint::Color> &color) { image_data_.get()->SetNextCommandColor(color); };
+        virtual void SetNextColor(std::shared_ptr<Color> &color) = 0;
 
         virtual bool LoadImage() = 0;
         virtual bool SaveImage() = 0;
@@ -38,8 +38,17 @@ namespace paint
 
     private:
         File file_;
-        std::shared_ptr<ImageData> image_data_;
-        std::deque<std::shared_ptr<ImageData>> image_data_history_;
+    };
+
+    template <class T>
+    class AbstractImageColor : public AbstractImage
+    {
+    public:
+        virtual void SetNextColor(std::shared_ptr<Color> &color) final { image_data_.get()->SetNextCommandColor(color); }
+
+    protected:
+        std::unique_ptr<ImageData<T>> image_data_;
+        std::deque<std::unique_ptr<ImageData<T>>> image_data_history_;
     };
 }
 

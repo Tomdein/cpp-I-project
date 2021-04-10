@@ -3,8 +3,6 @@
 
 #include <cstdint>
 
-#include <color.h>
-
 namespace paint
 {
     struct PixelRGB565

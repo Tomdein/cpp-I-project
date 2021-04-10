@@ -1,7 +1,6 @@
 #ifndef _H_PAINT_INC_PARSER_H
 #define _H_PAINT_INC_PARSER_H
 
-#include <filesystem>
 #include <regex>
 #include <exception>
 #include <cstring>
@@ -24,7 +23,14 @@ namespace paint
         parse_error(const std::string &error_substring)
         {
             size_t n = error_substring.copy(error_substring_, PARSE_ERROR_SUBSTRING_LEN);
-            error_substring_[n - 1] = '\0';
+            if (n != PARSE_ERROR_SUBSTRING_LEN)
+            {
+                error_substring_[n] = '\0';
+            }
+            else
+            {
+                error_substring_[PARSE_ERROR_SUBSTRING_LEN] = '\0';
+            }
         }
 
         virtual ~parse_error() override{};
@@ -42,6 +48,7 @@ namespace paint
         Parser() = default;
 
         static std::shared_ptr<Command> ParseLine(std::string &line);
+        static std::vector<std::pair<std::string, std::string>> ParseOptionalArgs(std::string &opt_args);
 
     private:
         static std::regex re_save_;
