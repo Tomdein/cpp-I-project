@@ -84,9 +84,9 @@ TEST(parser, parse_optional_args)
     ASSERT_NO_THROW(args = p.ParseOptionalArgs(s)) << "Failed to parse optional args";
     ASSERT_EQ(3, args.size());
     EXPECT_STREQ("border-color", args[0].first.c_str());
-    EXPECT_STREQ("{r: 0, g: 10, b: 255}", args[0].second.c_str());
+    EXPECT_STREQ("r: 0, g: 10, b: 255", args[0].second.c_str());
     EXPECT_STREQ("fill-color", args[1].first.c_str());
-    EXPECT_STREQ("{r: 0, g: 10, b: 255}", args[1].second.c_str());
+    EXPECT_STREQ("r: 0, g: 10, b: 255", args[1].second.c_str());
     EXPECT_STREQ("border-width", args[2].first.c_str());
     EXPECT_STREQ("10", args[2].second.c_str());
 
@@ -94,9 +94,9 @@ TEST(parser, parse_optional_args)
     ASSERT_NO_THROW(args = p.ParseOptionalArgs(s)) << "Failed to parse optional args";
     ASSERT_EQ(3, args.size());
     EXPECT_STREQ("fill-color", args[0].first.c_str());
-    EXPECT_STREQ("{r: 0, g: 10, b: 255}", args[0].second.c_str());
+    EXPECT_STREQ("r: 0, g: 10, b: 255", args[0].second.c_str());
     EXPECT_STREQ("border-color", args[1].first.c_str());
-    EXPECT_STREQ("{r: 0, g: 10, b: 255}", args[1].second.c_str());
+    EXPECT_STREQ("r: 0, g: 10, b: 255", args[1].second.c_str());
     EXPECT_STREQ("border-width", args[2].first.c_str());
     EXPECT_STREQ("10", args[2].second.c_str());
 
@@ -104,11 +104,11 @@ TEST(parser, parse_optional_args)
     ASSERT_NO_THROW(args = p.ParseOptionalArgs(s)) << "Failed to parse optional args";
     ASSERT_EQ(3, args.size());
     EXPECT_STREQ("fill-color", args[0].first.c_str());
-    EXPECT_STREQ("{r: 0, g: 10, b: 255}", args[0].second.c_str());
+    EXPECT_STREQ("r: 0, g: 10, b: 255", args[0].second.c_str());
     EXPECT_STREQ("border-width", args[1].first.c_str());
     EXPECT_STREQ("10", args[1].second.c_str());
     EXPECT_STREQ("border-color", args[2].first.c_str());
-    EXPECT_STREQ("{r: 0, g: 10, b: 255}", args[2].second.c_str());
+    EXPECT_STREQ("r: 0, g: 10, b: 255", args[2].second.c_str());
 }
 
 TEST(parser, parse_circle)

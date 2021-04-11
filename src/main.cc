@@ -27,6 +27,7 @@ int main()
     std::shared_ptr<paint::Command> command = p.ParseLine(s);
 
     std::vector<std::pair<std::string, std::string>> args;
-    s = "border-color: {r: 0, g: 10, b: 255}, fill-color: {r: 0, g: 10, b: 255}, border-width: 10";
+    //s = "border-color: {r: 0, g: 10, b: 255}, fill-color: {r: 0, g: 10, b: 255}, border-width: 10";
+    s = "border-width: 10";
     args = p.ParseOptionalArgs(s);
 }

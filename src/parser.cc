@@ -1,6 +1,7 @@
 #include <string>
 #include <memory>
 #include <regex>
+#include <iostream>
 
 #include "command.h"
 #include "parser.h"
@@ -31,7 +32,7 @@ namespace paint
     std::regex Parser::re_undo_ = std::regex("^UNDO$", std::regex::ECMAScript);
     std::regex Parser::re_redo_ = std::regex("^REDO$", std::regex::ECMAScript);
     std::regex Parser::re_param_delim_ = std::regex(",\\s(?=[^\\{\\}]*\\{[^\\{\\}]*\\}|[^\\{\\}]+$)", std::regex::ECMAScript);
-    std::regex Parser::re_param_ = std::regex("^([a-z-]+):\\s([a-z0-9-]+|\\{.+\\})$", std::regex::ECMAScript);
+    std::regex Parser::re_param_ = std::regex("^([a-z-]+):\\s(?:([a-z0-9-]+)|\\{(.+)\\})$", std::regex::ECMAScript);
 
     std::shared_ptr<Command> Parser::ParseLine(std::string &line)
     {
@@ -95,14 +96,15 @@ namespace paint
         for (; it != it_end; it++)
         {
             s = it->str();
-            std::regex_match(s, match, Parser::re_param_);
 
-            if (match.size() != 3)
+            // If failed to parse -> throw
+            if (!std::regex_match(s, match, Parser::re_param_))
             {
                 throw parse_error(s);
             }
 
-            parsed_args.emplace_back(match[1], match[2]);
+            // Concatenate match[2] & match[3]. One of the will be always empty
+            parsed_args.emplace_back(match[1].str(), match[2].str() + match[3].str());
         }
 
         return parsed_args;
