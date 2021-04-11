@@ -30,4 +30,5 @@ int main()
     //s = "border-color: {r: 0, g: 10, b: 255}, fill-color: {r: 0, g: 10, b: 255}, border-width: 10";
     s = "border-width: 10";
     args = p.ParseOptionalArgs(s);
+    //Auth test
 }
