@@ -51,7 +51,7 @@ namespace paint
         static std::shared_ptr<Command> ParseLine(const std::string &line);
         // Returns vector of pairs, that contain oprional args: <argument>, <value>.
         static std::vector<std::pair<std::string, std::string>> ParseOptionalArgs(const std::string &opt_args);
-        static ColorRGB888 ParseColorArg(const std::string &color_arg);
+        static ColorRGB888 ParseColorVal(const std::string &color_arg);
 
     private:
         static std::regex re_save_;

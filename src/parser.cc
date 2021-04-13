@@ -93,37 +93,23 @@ namespace paint
                     {
                         has_color = true;
 
-                        std::smatch color_match;
-                        std::regex_match(val, color_match, Parser::re_param_color_);
-
-                        // Could not match the color
-                        if (color_match.empty())
-                        {
-                            throw parse_error(arg);
-                        }
-
-                        int r = std::stoi(color_match[1].str());
-                        int g = std::stoi(color_match[2].str());
-                        int b = std::stoi(color_match[3].str());
-
-                        if (r > 255 || g > 255 || b > 255)
+                        line_command->AddLineColor(std::make_unique<ColorRGB888>(std::move(ParseColorVal(val))));
+                    }
+                    else if (arg == "width" && has_line_width == false)
+                    {
+                        int width = std::stoi(val);
+                        if (width == 0)
                         {
                             throw parse_error(val);
                         }
 
-                        line_command->AddLineColor(std::make_unique<ColorRGB888>(r, g, b));
-                    }
-                    else if (arg == "width" && has_line_width == false)
-                    {
                         has_line_width = true;
-                        line_command->AddLineWidth(std::stoi(val));
+                        line_command->AddLineWidth(width);
                     }
                     else
                     {
                         throw parse_error(match[7].str());
                     }
-
-                    std::cout << "arg: " << arg << ", val: " << val << '\n';
                 }
             }
 
@@ -191,7 +177,7 @@ namespace paint
         return parsed_args;
     }
 
-    ColorRGB888 Parser::ParseColorArg(const std::string &color_arg)
+    ColorRGB888 Parser::ParseColorVal(const std::string &color_arg)
     {
         std::smatch color_match;
         std::regex_match(color_arg, color_match, Parser::re_param_color_);
@@ -211,6 +197,6 @@ namespace paint
             throw parse_error(color_arg);
         }
 
-        line_command->AddLineColor(std::make_unique<ColorRGB888>(r, g, b));
+        return ColorRGB888(r, g, b);
     }
 }
