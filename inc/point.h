@@ -1,7 +1,8 @@
 #ifndef PAINT_INC_POINT_H_
 #define PAINT_INC_POINT_H_
 
-//#include "image_data.h"
+#include <cmath>
+
 #include "unit.h"
 
 namespace paint
@@ -16,6 +17,7 @@ namespace paint
     {
     public:
         BasePoint() = default;
+        virtual ~BasePoint(){};
 
         virtual Point GetPointPX(const Point &dimensions) = 0;
     };
@@ -24,8 +26,9 @@ namespace paint
     {
     public:
         PointPX(uint32_t x, uint32_t y) : point_{x, y} {};
+        virtual ~PointPX(){};
 
-        virtual Point GetPointPX(const Point &dimensions) override;
+        virtual Point GetPointPX([[maybe_unused]] const Point &dimensions) override { return point_; };
 
     private:
         Point point_;
@@ -35,8 +38,13 @@ namespace paint
     {
     public:
         PointPer(float x, float y) : x_(x), y_(y){};
+        virtual ~PointPer(){};
 
-        virtual Point GetPointPX(const Point &dimensions) override;
+        virtual Point GetPointPX(const Point &dimensions) override
+        {
+            return Point{static_cast<Unit>(std::roundf(dimensions.x * x_)),
+                         static_cast<Unit>(roundf(dimensions.y * y_))};
+        };
 
     private:
         float x_;

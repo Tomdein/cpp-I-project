@@ -47,8 +47,11 @@ namespace paint
     public:
         Parser() = default;
 
-        static std::shared_ptr<Command> ParseLine(std::string &line);
-        static std::vector<std::pair<std::string, std::string>> ParseOptionalArgs(std::string &opt_args);
+        // Parses whole line and returns the Command class. This method throws if line with unknown command is passed.
+        static std::shared_ptr<Command> ParseLine(const std::string &line);
+        // Returns vector of pairs, that contain oprional args: <argument>, <value>.
+        static std::vector<std::pair<std::string, std::string>> ParseOptionalArgs(const std::string &opt_args);
+        static ColorRGB888 ParseColorArg(const std::string &color_arg);
 
     private:
         static std::regex re_save_;
@@ -66,6 +69,7 @@ namespace paint
         static std::regex re_redo_;
         static std::regex re_param_delim_;
         static std::regex re_param_;
+        static std::regex re_param_color_;
     };
 }
 

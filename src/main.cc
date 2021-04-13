@@ -1,11 +1,15 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <regex>
 
 #include <typeinfo>
 
 #include "parser.h"
 #include "color.h"
+#include "paint.h"
+
+std::regex re_param_color_ = std::regex("^r:\\s(\\d{1,3}),\\sg:\\s(\\d{1,3}),\\sb:\\s(\\d{1,3})$", std::regex::ECMAScript);
 
 int main()
 {
@@ -22,7 +26,7 @@ int main()
 
     std::smatch match;
     std::regex re_circle_ = std::regex("^CIRCLE\\s(%|PX)\\s(\\d+)\\s(\\d+)\\s(\\d+)(:?\\s\\{(.*)\\})?$", std::regex::ECMAScript);
-    bool matched = std::regex_match(s, match, re_circle_);
+    [[maybe_unused]] bool matched = std::regex_match(s, match, re_circle_);
 
     std::shared_ptr<paint::Command> command = p.ParseLine(s);
 
@@ -30,5 +34,18 @@ int main()
     //s = "border-color: {r: 0, g: 10, b: 255}, fill-color: {r: 0, g: 10, b: 255}, border-width: 10";
     s = "border-width: 10";
     args = p.ParseOptionalArgs(s);
-    //Auth test
+
+    paint::Parser::ParseLine("LINE PX 1 2 3 4");
+    paint::Parser::ParseLine("LINE PX 1 2 3 4 {width: 50, color: {r: 0, g: 5, b: 255}}");
+
+    // s = "r: 1, g: 10, b: 500";
+    // std::regex_match(s, match, re_param_color_);
+
+    // std::cout << match[1].str() << ", " << match[2].str() << ", " << match[3].str() << std::endl;
+
+    // int r = std::stoi(match[1].str());
+    // int g = std::stoi(match[2].str());
+    // int b = std::stoi(match[3].str());
+
+    // std::cout << r << ", " << g << ", " << b << std::endl;
 }
