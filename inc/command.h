@@ -125,7 +125,7 @@ namespace paint
     class ResizeCommand : public Command
     {
     public:
-        explicit ResizeCommand(std::string name) : Command(name){};
+        explicit ResizeCommand(std::unique_ptr<BasePoint> &&new_size) : Command("ResizeCommand"), new_size_(std::move(new_size)){};
         virtual ~ResizeCommand(){};
 
         virtual void Invoke(AbstractImage &im) override
@@ -135,7 +135,7 @@ namespace paint
         };
 
     private:
-        std::shared_ptr<BasePoint> size_;
+        std::unique_ptr<BasePoint> new_size_;
     };
 
     // TODO RotateCommand

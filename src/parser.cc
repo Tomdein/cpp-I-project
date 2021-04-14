@@ -132,6 +132,19 @@ namespace paint
         }
         else if (std::regex_match(line, match, Parser::re_resize_))
         {
+            std::shared_ptr<ResizeCommand> resize_command;
+
+            if (match[1].str() == "%")
+            {
+                resize_command = std::make_shared<ResizeCommand>(std::make_unique<PointPer>(std::stof(match[2].str()),
+                                                                                            std::stof(match[3].str())));
+            }
+            else if (match[1].str() == "PX")
+            {
+                resize_command = std::make_shared<ResizeCommand>(std::make_unique<PointPX>(std::stoi(match[2].str()),
+                                                                                           std::stoi(match[3].str())));
+            }
+            command = std::move(resize_command);
         }
         else if (std::regex_match(line, match, Parser::re_rotate_))
         {
