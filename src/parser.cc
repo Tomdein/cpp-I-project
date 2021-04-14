@@ -8,6 +8,7 @@
 
 #include "unit.h"
 #include "point.h"
+#include "rotation.h"
 #include "command.h"
 #include "parser.h"
 
@@ -130,6 +131,7 @@ namespace paint
         else if (std::regex_match(line, match, Parser::re_bucket_))
         {
         }
+        // RESIZE command
         else if (std::regex_match(line, match, Parser::re_resize_))
         {
             std::shared_ptr<ResizeCommand> resize_command;
@@ -148,6 +150,16 @@ namespace paint
         }
         else if (std::regex_match(line, match, Parser::re_rotate_))
         {
+            std::shared_ptr<RotateCommand> rotate_command;
+
+            if (match[1].str() == "CLOCK")
+            {
+                rotate_command = std::make_shared<RotateCommand>(Rotation::kClock);
+            }
+            else
+            {
+                rotate_command = std::make_shared<RotateCommand>(Rotation::kCounterClock);
+            }
         }
         else if (std::regex_match(line, match, Parser::re_invert_colors_))
         {

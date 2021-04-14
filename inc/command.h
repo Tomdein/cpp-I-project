@@ -142,7 +142,7 @@ namespace paint
     class RotateCommand : public Command
     {
     public:
-        explicit RotateCommand(std::string name) : Command(name){};
+        explicit RotateCommand(const Rotation &rotation) : Command("RotateCommand"), rotation_(rotation){};
         virtual ~RotateCommand(){};
 
         virtual void Invoke(AbstractImage &im) override

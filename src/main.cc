@@ -39,14 +39,16 @@ int main()
     paint::Parser::ParseLine("LINE PX 1 2 3 4");
     paint::Parser::ParseLine("LINE PX 1 2 3 4 {width: 50, color: {r: 0, g: 5, b: 255}}");
 
-    // s = "r: 1, g: 10, b: 500";
-    // std::regex_match(s, match, re_param_color_);
+    s = "r: 1, g: 10, b: 500";
+    std::regex_match(s, match, re_param_color_);
 
-    // std::cout << match[1].str() << ", " << match[2].str() << ", " << match[3].str() << std::endl;
+    std::cout << match[1].str() << ", " << match[2].str() << ", " << match[3].str() << std::endl;
 
-    // int r = std::stoi(match[1].str());
-    // int g = std::stoi(match[2].str());
-    // int b = std::stoi(match[3].str());
+    int r = std::stoi(match[1].str());
+    int g = std::stoi(match[2].str());
+    int b = std::stoi(match[3].str());
 
-    // std::cout << r << ", " << g << ", " << b << std::endl;
+    std::cout << r << ", " << g << ", " << b << std::endl;
+
+    std::cout << re_param_color_.mark_count() << ", " << match.size() << std::endl;
 }
