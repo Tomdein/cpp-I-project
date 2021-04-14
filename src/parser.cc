@@ -117,7 +117,6 @@ namespace paint
         }
         else if (std::regex_match(line, match, Parser::re_circle_))
         {
-            return std::make_shared<CircleCommand>();
         }
         else if (std::regex_match(line, match, Parser::re_bucket_))
         {
