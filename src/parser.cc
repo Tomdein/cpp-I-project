@@ -60,8 +60,16 @@ namespace paint
         // COLOR command
         else if (std::regex_match(line, match, Parser::re_color_))
         {
-            // TODO: Finish
-            command = std::make_shared<ColorCommand>(std::shared_ptr<Color>(new ColorRGB888(0, 0, 0)));
+            int r = std::stoi(match[1].str());
+            int g = std::stoi(match[2].str());
+            int b = std::stoi(match[3].str());
+
+            if (r > 255 || g > 255 || b > 255)
+            {
+                throw parse_error(line);
+            }
+
+            command = std::make_shared<ColorCommand>(std::shared_ptr<Color>(new ColorRGB888(r, g, b)));
         }
         // LINE command
         else if (std::regex_match(line, match, Parser::re_line_))
