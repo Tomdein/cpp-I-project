@@ -2,8 +2,12 @@
 #define PAINT_INC_COMMAND_H_
 
 #include <memory>
+#include <optional>
 #include <filesystem>
 
+#include "unit.h"
+#include "point.h"
+#include "color.h"
 #include "image.h"
 #include "rotation.h"
 

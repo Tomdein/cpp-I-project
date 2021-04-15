@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "file.h"
-#include "image_data.h"
 
 namespace paint
 {
