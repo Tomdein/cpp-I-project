@@ -5,6 +5,7 @@
 #include <exception>
 #include <cstring>
 
+#include "color.h"
 #include "command.h"
 
 namespace paint
