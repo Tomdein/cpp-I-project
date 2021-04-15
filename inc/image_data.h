@@ -7,20 +7,21 @@
 #include "unit.h"
 #include "point.h"
 #include "color.h"
-#include "data_pixel.h"
+#include "data_pixels.h"
 #include "rotation.h"
+#include "painter.h"
 
 namespace paint
 {
 
-    // Accepts any class 'Color'
+    // Accepts any 'Color' class
     template <class T>
     class ImageData
     {
     public:
         ImageData(Point image_size) : image_size_(image_size)
         {
-            data_pixels_ = std::make_unique<DataPixel>(image_size, sizeof(data_color_.data()));
+            data_pixels_ = std::make_unique<DataPixels>(image_size, sizeof(data_color_.data()));
             data_color_ = std::make_unique<T>();
         }
 
@@ -58,7 +59,9 @@ namespace paint
         Point image_size_;
         const std::unique_ptr<T> data_color_;
         std::unique_ptr<T> next_command_color_;
-        std::unique_ptr<DataPixel> data_pixels_;
+        std::unique_ptr<DataPixels> data_pixels_;
+
+        friend Painter;
     };
 }
 
