@@ -6,7 +6,6 @@
 
 #include "unit.h"
 #include "point.h"
-#include "painter.h"
 
 namespace paint
 {
@@ -119,7 +118,7 @@ namespace paint
         std::unique_ptr<Color> data_color_;
         uint8_t *data_;
 
-        friend Painter;
+        friend class Painter;
     };
 }
 
