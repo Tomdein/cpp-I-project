@@ -44,7 +44,7 @@ namespace paint
     class AbstractImageColor : public AbstractImage
     {
     public:
-        virtual void SetNextColor(std::shared_ptr<Color> &color) final { image_data_.get()->SetNextCommandColor(color); }
+        virtual void SetNextColor(std::weak_ptr<Color> &color) final { image_data_.get()->SetNextCommandColor(color); }
 
     protected:
         std::unique_ptr<ImageData<T>> image_data_;
