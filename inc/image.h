@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "file.h"
+#include "data_pixels.h"
 
 namespace paint
 {
@@ -35,20 +36,11 @@ namespace paint
         virtual void Undo() = 0;
         virtual void Redo() = 0;
 
-    private:
+    protected:
+        std::unique_ptr<DataPixels> image_data_;
+        std::deque<std::unique_ptr<DataPixels>> image_data_history_;
         File file_;
     };
-
-    // template <class T>
-    // class AbstractImageColor : public AbstractImage
-    // {
-    // public:
-    //     virtual void SetNextColor(std::shared_ptr<Color> &color) final { image_data_.get()->SetNextCommandColor(color); }
-
-    // protected:
-    //     std::unique_ptr<ImageData<T>> image_data_;
-    //     std::deque<std::unique_ptr<ImageData<T>>> image_data_history_;
-    // };
 }
 
 #endif // PAINT_INC_IMAGE_H_

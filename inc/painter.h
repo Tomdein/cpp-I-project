@@ -8,7 +8,6 @@
 #include "point.h"
 #include "color.h"
 #include "rotation.h"
-#include "image_data.h"
 
 namespace paint
 {
