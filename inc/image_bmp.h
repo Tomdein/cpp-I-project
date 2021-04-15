@@ -32,12 +32,16 @@ namespace paint
     };
 
     template <class T>
-    class ImageBMP : Image
+    class ImageBMP : Image<T>
     {
     public:
+        virtual void LoadImage() override {}
+        virtual void SaveImage() override {}
+        virtual void GenerateMetadata() override {}
+
     private:
         HeaderBMP header_bmp_;
-        HeaderBMPInfoHeader header_bmp_info_;
+        HeaderBMPInfo header_bmp_info_;
     };
 
 }

@@ -6,35 +6,22 @@
 
 #include "file.h"
 #include "image_data.h"
+#include "painter.h"
 
 namespace paint
 {
 
+    template <class T>
     class Image
     {
     public:
-        virtual void SetNextColor(std::shared_ptr<Color> &color) = 0;
+        virtual void LoadImage() = 0;
+        virtual void SaveImage() = 0;
+        virtual void GenerateMetadata() = 0;
 
-        virtual bool LoadImage() = 0;
-        virtual bool SaveImage() = 0;
-        virtual bool GenerateMetadata() = 0;
-
-        virtual void DrawLine() = 0;
-        virtual void DrawCircle() = 0;
-        virtual void DrawBucket() = 0;
-
-        // Crop, Resize and Rotate modifies the headers
-        virtual void Crop() = 0;
-        virtual void Resize() = 0;
-        virtual void Rotate() = 0;
-
-        // InvertColors and ConvertToGrayscale *CAN* modify the headers
-        virtual void InvertColors() = 0;
-        virtual void ConvertToGrayscale() = 0;
-
-        // Undo and Redo *CAN* modify the headers
-        virtual void Undo() = 0;
-        virtual void Redo() = 0;
+    protected:
+        std::unique_ptr<ImageData<T>> image_data_;
+        std::deque<std::unique_ptr<ImageData<T>>> image_data_history_;
 
     private:
         File file_;

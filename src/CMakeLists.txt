@@ -2,7 +2,7 @@
 
 FILE(GLOB SRCFILES *.cc)
 
-set(PaintSources ./color.cc ./parser.cc ./paint.cc)
+set(PaintSources ./color.cc ./parser.cc ./paint.cc ./image_png.cc)
 
 add_executable(Paint ./main.cc  ${PaintSources})
 add_executable(App ./app.cc ${PaintSources})
