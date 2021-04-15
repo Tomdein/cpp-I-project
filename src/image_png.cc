@@ -2,6 +2,8 @@
 
 namespace paint
 {
+    namespace image_png
+    {
 
-    const uint64_t PNG_SIGNATURE = 0x89504e470d0a1a0aULL;
+    }
 }

@@ -6,8 +6,7 @@
 namespace paint
 {
 
-    template <class T>
-    class ImageTIFF : Image<T>
+    class ImageTIFF : public Image
     {
     public:
         ImageTIFF() = default;
@@ -17,8 +16,6 @@ namespace paint
         virtual void GenerateMetadata() override {}
 
     private:
-        HeaderBMP header_bmp_;
-        HeaderBMPInfo header_bmp_info_;
     };
 }
 

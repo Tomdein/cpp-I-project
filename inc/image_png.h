@@ -7,32 +7,35 @@
 
 namespace paint
 {
-    struct ChunkIHDR
+    namespace image_png
     {
-        uint32_t width;
-        uint32_t height;
-        uint8_t bit_depth;
-        uint8_t color_type;
-        uint8_t compresison_method;
-        uint8_t filter_method;
-        uint8_t interlace_method;
-    };
 
-    const static uint64_t PNG_SIGNATURE;
+        const uint64_t kPNGSignature = 0x89504e470d0a1a0aULL;
 
-    template <class T>
-    class ImagePNG : Image<T>
-    {
-    public:
-        ImagePNG() = default;
+        struct ChunkIHDR
+        {
+            uint32_t width;
+            uint32_t height;
+            uint8_t bit_depth;
+            uint8_t color_type;
+            uint8_t compresison_method;
+            uint8_t filter_method;
+            uint8_t interlace_method;
+        };
 
-        virtual void LoadImage() override {}
-        virtual void SaveImage() override {}
-        virtual void GenerateMetadata() override {}
+        class ImagePNG : public Image
+        {
+        public:
+            ImagePNG() = default;
 
-    private:
-        ChunkIHDR chunk_ihdr_;
-    };
+            virtual void LoadImage() override {}
+            virtual void SaveImage() override {}
+            virtual void GenerateMetadata() override {}
+
+        private:
+            ChunkIHDR chunk_ihdr_;
+        };
+    }
 }
 
 #endif // PAINT_INC_IMAGE_PNG_H_
