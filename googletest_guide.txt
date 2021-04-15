@@ -1,1 +1,2 @@
 https://stackoverflow.com/questions/52394031/cmake-error-include-could-not-find-load-file-googletest
+git ls-files | xargs wc -l // count number of lines
