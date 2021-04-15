@@ -6,6 +6,7 @@
 
 #include "unit.h"
 #include "point.h"
+#include "painter.h"
 
 namespace paint
 {
@@ -38,12 +39,28 @@ namespace paint
     class DataPixels
     {
     public:
-        DataPixels(Point size, size_t pixel_struct_size_byte) : pixel_struct_size_byte_(pixel_struct_size_byte), picture_size_(size)
+        DataPixels(Point image_size, std::unique_ptr<Color> &&color_type) : pixel_struct_size_byte_(color_type->GetDataSize()),
+                                                                            image_size_(image_size),
+                                                                            pixel_count_(image_size.x * image_size.y),
+                                                                            data_color_(std::move(color_type))
         {
-            size_ = size.x * size.y;
-            data_ = new uint8_t[size_ * pixel_struct_size_byte_];
+            data_ = new uint8_t[pixel_count_ * pixel_struct_size_byte_];
         }
-        ~DataPixels() { delete static_cast<uint8_t *>(data_); }
+
+        DataPixels(const DataPixels &other) : pixel_struct_size_byte_(other.data_color_->GetDataSize()),
+                                              image_size_(other.image_size_),
+                                              pixel_count_(other.pixel_count_),
+                                              data_color_(std::unique_ptr<Color>(other.data_color_->clone()))
+        {
+            size_t byte_count = pixel_count_ * pixel_struct_size_byte_;
+            data_ = new uint8_t[byte_count];
+            mempcpy(this->data_, other.data_, byte_count);
+        }
+
+        ~DataPixels()
+        {
+            delete static_cast<uint8_t *>(data_);
+        }
 
         // The data in iterator is not dereferencable. It is just a 'void *'
         class iterator
@@ -69,21 +86,21 @@ namespace paint
         void *operator[](size_t pos) { return &data_[pos]; }
         void *at(Unit x, Unit y)
         {
-            if (x >= picture_size_.x || y >= picture_size_.y)
+            if (x >= image_size_.x || y >= image_size_.y)
             {
                 throw std::out_of_range("Accesssing data pixels out of range.");
             }
-            return &data_[x * picture_size_.x + y];
+            return &data_[x * image_size_.x + y];
         }
 
-        iterator begin() { return iterator(data_, pixel_struct_size_byte_); };
-        iterator end() { return iterator(&data_[size_], pixel_struct_size_byte_); };
+        iterator begin() { return iterator(data_, pixel_struct_size_byte_); }
+        iterator end() { return iterator(data_ + pixel_count_, pixel_struct_size_byte_); }
 
         iterator GetIterator() const { return iterator(data_, pixel_struct_size_byte_); }
 
         void CopyData(const DataPixels &other)
         {
-            if ((pixel_struct_size_byte_ != other.pixel_struct_size_byte_) || (size_ != other.size_))
+            if ((pixel_struct_size_byte_ != other.pixel_struct_size_byte_) || (pixel_count_ != other.pixel_count_))
                 throw error_data_mismatch();
 
             iterator this_it = this->GetIterator();
@@ -97,9 +114,12 @@ namespace paint
 
     private:
         size_t pixel_struct_size_byte_;
-        Point picture_size_;
-        size_t size_;
+        Point image_size_;
+        size_t pixel_count_;
+        std::unique_ptr<Color> data_color_;
         uint8_t *data_;
+
+        friend Painter;
     };
 }
 

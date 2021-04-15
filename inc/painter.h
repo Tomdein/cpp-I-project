@@ -2,8 +2,12 @@
 #define PAINT_INC_PAINTER_H_
 
 #include <memory>
+#include <optional>
 
+#include "unit.h"
+#include "point.h"
 #include "color.h"
+#include "rotation.h"
 #include "image_data.h"
 
 namespace paint
@@ -15,21 +19,25 @@ namespace paint
 
         virtual void SetData();
 
-        virtual void SetNextColor(std::shared_ptr<Color> &color) = 0;
+        void SetNextColor(std::shared_ptr<Color> &color) { next_command_color_->SetColor(*color); }
 
         // Move to img?
         // virtual void LoadImage() = 0;
         // virtual void SaveImage() = 0;
         // virtual void GenerateMetadata() = 0;
 
-        virtual void DrawLine() = 0;
-        virtual void DrawCircle() = 0;
-        virtual void DrawBucket() = 0;
+        virtual void DrawLine(const Point &start, const Point &end) = 0;
+        virtual void DrawCircle(const Point &start, const Point &radius,
+                                bool fill = false,
+                                std::optional<Color &> fill_color = std::nullopt,
+                                std::optional<Color &> border_color = std::nullopt,
+                                Unit border_width = Unit(1)) = 0;
+        virtual void DrawBucket(const Point &point, std::optional<Color &> fill_color = std::nullopt) = 0;
 
         // Crop, Resize and Rotate modifies the headers
-        virtual void Crop() = 0;
-        virtual void Resize() = 0;
-        virtual void Rotate() = 0;
+        virtual void Crop(const Point &corner1, const Point &corner2) = 0;
+        virtual void Resize(const Point &new_size) = 0;
+        virtual void Rotate(Rotation rotation) = 0;
 
         // InvertColors and ConvertToGrayscale *CAN* modify the headers
         virtual void InvertColors() = 0;
@@ -39,10 +47,8 @@ namespace paint
         virtual void Undo() = 0;
         virtual void Redo() = 0;
 
-        // void SetNextColor(std::weak_ptr<Color> &color) final { image_data_.get()->SetNextCommandColor(color); }
-
     private:
-        std::unique_ptr<Color> color_format_;
+        std::unique_ptr<Color> next_command_color_;
     };
 }
 

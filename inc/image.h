@@ -40,16 +40,16 @@ namespace paint
         File file_;
     };
 
-    template <class T>
-    class AbstractImageColor : public AbstractImage
-    {
-    public:
-        virtual void SetNextColor(std::shared_ptr<Color> &color) final { image_data_.get()->SetNextCommandColor(color); }
+    // template <class T>
+    // class AbstractImageColor : public AbstractImage
+    // {
+    // public:
+    //     virtual void SetNextColor(std::shared_ptr<Color> &color) final { image_data_.get()->SetNextCommandColor(color); }
 
-    protected:
-        std::unique_ptr<ImageData<T>> image_data_;
-        std::deque<std::unique_ptr<ImageData<T>>> image_data_history_;
-    };
+    // protected:
+    //     std::unique_ptr<ImageData<T>> image_data_;
+    //     std::deque<std::unique_ptr<ImageData<T>>> image_data_history_;
+    // };
 }
 
 #endif // PAINT_INC_IMAGE_H_
