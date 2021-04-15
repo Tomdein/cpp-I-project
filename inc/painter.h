@@ -16,7 +16,14 @@ namespace paint
     public:
         Painter() = default;
 
-        virtual void SetData();
+        void AttachImageData(const std::weak_ptr<DataPixels> &image_data)
+        {
+            image_data_ = image_data;
+        }
+        void DetachImageData()
+        {
+            image_data_.reset();
+        }
 
         void SetNextColor(std::shared_ptr<Color> &color) { next_command_color_->SetColor(*color); }
 
@@ -48,6 +55,7 @@ namespace paint
 
     private:
         std::unique_ptr<Color> next_command_color_;
+        std::weak_ptr<DataPixels> image_data_;
     };
 }
 

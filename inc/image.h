@@ -6,6 +6,7 @@
 
 #include "file.h"
 #include "data_pixels.h"
+#include "painter.h"
 
 namespace paint
 {
@@ -37,9 +38,12 @@ namespace paint
         virtual void Redo() = 0;
 
     protected:
+        File file_;
+
+    private:
         std::unique_ptr<DataPixels> image_data_;
         std::deque<std::unique_ptr<DataPixels>> image_data_history_;
-        File file_;
+        Painter painter_;
     };
 }
 
