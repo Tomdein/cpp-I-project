@@ -4,6 +4,6 @@
 #include <cstdint>
 namespace paint
 {
-    using Unit = uint32_t;
+    using Unit = int32_t;
 }
 #endif // PAINT_INC_UNIT_H_

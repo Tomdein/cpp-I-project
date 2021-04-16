@@ -25,7 +25,7 @@ namespace paint
     class PointPX : public BasePoint
     {
     public:
-        PointPX(uint32_t x, uint32_t y) : point_{x, y} {};
+        PointPX(int32_t x, int32_t y) : point_{x, y} {};
         virtual ~PointPX(){};
 
         virtual Point GetPointPX([[maybe_unused]] const Point &dimensions) override { return point_; };
