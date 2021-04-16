@@ -53,4 +53,10 @@ int main()
     std::cout << re_param_color_.mark_count() << ", " << match.size() << std::endl;
 
     paint::Parser::ParseLine("CIRCLE PX 1 2 3 {fill-color: {r: 0, g: 5, b: 255}}");
+
+    paint::DataPixels dp(paint::Point{10, 10}, std::unique_ptr<paint::Color>(new paint::ColorRGB888()));
+    dp.GetColorType();
+
+    paint::ColorRGB565 color_inverse(0, 62, 5);
+    color_inverse.InvertColor();
 }

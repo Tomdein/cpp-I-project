@@ -28,6 +28,7 @@ namespace paint
         public:
             ImagePNG() = default;
 
+            virtual void CreateImage() override {}
             virtual void LoadImage() override {}
             virtual void SaveImage() override {}
             virtual void GenerateMetadata() override {}

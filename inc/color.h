@@ -4,6 +4,7 @@
 #include <utility>
 #include <cstdint>
 #include <string>
+#include <algorithm>
 
 #include "pixel.h"
 
@@ -17,15 +18,17 @@ namespace paint
     public:
         Color() = default;
         virtual ~Color() {}
-        virtual Color *clone() = 0;
+        virtual Color *clone() const = 0;
 
         virtual ColorRGB565 ToRGB565() const = 0;
         virtual ColorRGB888 ToRGB888() const = 0;
 
         virtual void SetColor(const Color &other) = 0;
+        virtual void InvertColor() = 0;
 
+        virtual void SetFromData(const void *data) = 0;
         virtual void *GetData() = 0;
-        virtual size_t GetDataSize() = 0;
+        virtual size_t GetDataSize() const = 0;
     };
 
     class ColorRGB565 : public Color
@@ -34,7 +37,7 @@ namespace paint
         ColorRGB565() = default;
         ColorRGB565(uint8_t red, uint8_t green, uint8_t blue) : pixel_{red, green, blue} {}
         virtual ~ColorRGB565() {}
-        virtual ColorRGB565 *clone() { return new ColorRGB565{*this}; }
+        virtual ColorRGB565 *clone() const override { return new ColorRGB565{*this}; }
 
         //ColorRGB565(const ColorRGB565 &other) : pixel_.red(other.pixel_.red), pixel_.green(other.pixel_.green), pixel_.blue(other.pixel_.blue) {}
         ColorRGB565(const ColorRGB565 &other) : pixel_{other.pixel_} {}
@@ -48,6 +51,11 @@ namespace paint
         virtual ColorRGB565 ToRGB565() const override;
         virtual ColorRGB888 ToRGB888() const override;
 
+        virtual void SetFromData(const void *data) override
+        {
+            std::copy_n(reinterpret_cast<const PixelRGB565 *>(data), 1, &pixel_);
+            // memcpy(&pixel_, data, sizeof(PixelRGB565));
+        };
         virtual void SetColor(const Color &other) { *this = std::move(other.ToRGB565()); };
         void SetColor(uint8_t red, uint8_t green, uint8_t blue)
         {
@@ -56,8 +64,15 @@ namespace paint
             pixel_.b = blue;
         }
 
-        virtual void *GetData() override { return &pixel_; };
-        virtual size_t GetDataSize() override { return sizeof(PixelRGB565); };
+        virtual void InvertColor() override
+        {
+            pixel_.r = ~pixel_.r;
+            pixel_.g = ~pixel_.g;
+            pixel_.b = ~pixel_.b;
+        }
+
+        virtual void *GetData() override { return reinterpret_cast<void *>(&pixel_); };
+        virtual size_t GetDataSize() const override { return sizeof(PixelRGB565); };
 
     private:
         PixelRGB565 pixel_;
@@ -69,7 +84,7 @@ namespace paint
         ColorRGB888() = default;
         ColorRGB888(uint8_t red, uint8_t green, uint8_t blue) : pixel_{red, green, blue} {}
         virtual ~ColorRGB888() {}
-        virtual ColorRGB888 *clone() { return new ColorRGB888{*this}; }
+        virtual ColorRGB888 *clone() const override { return new ColorRGB888{*this}; }
 
         ColorRGB888(const ColorRGB888 &other) : pixel_{other.pixel_.r, other.pixel_.g, other.pixel_.b} {}
         ColorRGB888(const Color &other) { *this = std::move(other.ToRGB888()); }
@@ -89,8 +104,20 @@ namespace paint
             pixel_.b = blue;
         }
 
-        virtual void *GetData() override { return &pixel_; };
-        virtual size_t GetDataSize() override { return sizeof(PixelRGB888); };
+        virtual void InvertColor() override
+        {
+            pixel_.r = ~pixel_.r;
+            pixel_.g = ~pixel_.g;
+            pixel_.b = ~pixel_.b;
+        }
+
+        virtual void SetFromData(const void *data) override
+        {
+            std::copy_n(reinterpret_cast<const PixelRGB888 *>(data), 1, &pixel_);
+            //memcpy(&pixel_, data, sizeof(PixelRGB888));
+        };
+        virtual void *GetData() override { return reinterpret_cast<void *>(&pixel_); };
+        virtual size_t GetDataSize() const override { return sizeof(PixelRGB888); };
 
     private:
         PixelRGB888 pixel_;

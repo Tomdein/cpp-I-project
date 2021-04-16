@@ -19,7 +19,7 @@ namespace paint
         BasePoint() = default;
         virtual ~BasePoint(){};
 
-        virtual Point GetPointPX(const Point &dimensions) = 0;
+        virtual Point GetPointPX(const Point &dimensions) const = 0;
     };
 
     class PointPX : public BasePoint
@@ -28,7 +28,7 @@ namespace paint
         PointPX(int32_t x, int32_t y) : point_{x, y} {};
         virtual ~PointPX(){};
 
-        virtual Point GetPointPX([[maybe_unused]] const Point &dimensions) override { return point_; };
+        virtual Point GetPointPX([[maybe_unused]] const Point &dimensions) const override { return point_; };
 
     private:
         Point point_;
@@ -40,7 +40,7 @@ namespace paint
         PointPer(float x, float y) : x_(x), y_(y){};
         virtual ~PointPer(){};
 
-        virtual Point GetPointPX(const Point &dimensions) override
+        virtual Point GetPointPX(const Point &dimensions) const override
         {
             return Point{static_cast<Unit>(std::roundf(dimensions.x * x_)),
                          static_cast<Unit>(roundf(dimensions.y * y_))};

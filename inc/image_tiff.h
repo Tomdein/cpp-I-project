@@ -11,6 +11,7 @@ namespace paint
     public:
         ImageTIFF() = default;
 
+        virtual void CreateImage() override {}
         virtual void LoadImage() override {}
         virtual void SaveImage() override {}
         virtual void GenerateMetadata() override {}

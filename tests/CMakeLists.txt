@@ -3,7 +3,8 @@ include_directories(${PARENT_PATH_OF_GTEST}/googltest/googltest/include)
 # add_executable(parse_test "./parser_test.cpp")
 # target_include_directories(parse_test PUBLIC "${Paint_SOURCE_DIR}/inc")
 
-set(PaintSources ../src/color.cc ../src/parser.cc)
+set(PaintSources ../src/color.cc ../src/parser.cc ../src/painter.cc)
+# file(GLOB PaintSources ../src/*.cc)
 
 add_executable(parser_test "./parser_test.cc" ${PaintSources})
 add_executable(parser_line_command "./parser_line_test.cc" ${PaintSources})

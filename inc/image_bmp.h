@@ -67,6 +67,7 @@ namespace paint
         class ImageBMP : public Image
         {
         public:
+            virtual void CreateImage() override {}
             virtual void LoadImage() override {}
             virtual void SaveImage() override {}
             virtual void GenerateMetadata() override {}

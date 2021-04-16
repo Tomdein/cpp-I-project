@@ -51,7 +51,7 @@ namespace paint
         virtual void Invoke(Image &im) override
         {
             std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
-            im.SetNextColor(color_);
+            im.painter.SetNextColor(color_);
         };
 
     private:
@@ -69,7 +69,7 @@ namespace paint
         virtual void Invoke(Image &im) override
         {
             std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
-            im.DrawLine();
+            im.painter.DrawLine(*start_point_, *end_point_, line_color_, line_width_);
         };
 
         void AddLineColor(std::shared_ptr<Color> &&color) { line_color_.emplace(std::move(color)); };
@@ -93,16 +93,16 @@ namespace paint
         virtual void Invoke(Image &im) override
         {
             std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
-            im.DrawCircle();
+            im.painter.DrawCircle(*center_, radius_, fill_.value_or(false), fill_color_, border_color_, border_width_);
         };
 
         void SetCircleFill(bool do_fill) { fill_ = do_fill; };
 
-        void AddCircleFillColor(std::shared_ptr<Color> &&color) { fill_color_ = std::move(color); };
-        void AddCircleFillColor(const Color &color) { fill_color_->SetColor(color); };
+        void AddCircleFillColor(std::shared_ptr<Color> &&color) { fill_color_ = std::make_optional<std::shared_ptr<Color>>(std::move(color)); };
+        void AddCircleFillColor(const Color &color) { fill_color_ = std::make_optional<std::shared_ptr<Color>>(color.clone()); };
 
-        void AddCircleBorderColor(std::shared_ptr<Color> &&color) { border_color_ = std::move(color); };
-        void AddCircleBorderColor(const Color &color) { border_color_->SetColor(color); };
+        void AddCircleBorderColor(std::shared_ptr<Color> &&color) { border_color_ = std::make_optional<std::shared_ptr<Color>>(std::move(color)); };
+        void AddCircleBorderColor(const Color &color) { border_color_ = std::make_optional<std::shared_ptr<Color>>(color.clone()); };
 
         void AddCircleBorderWidth(const Unit &border_width)
         {
@@ -119,10 +119,10 @@ namespace paint
         Unit radius_;
 
         // Optional parameters
-        bool fill_ = false; // Set fill_ to false as default
-        std::shared_ptr<Color> fill_color_;
-        std::shared_ptr<Color> border_color_;
-        Unit border_width_;
+        std::optional<bool> fill_ = false; // Set fill_ to false as default
+        std::optional<std::shared_ptr<Color>> fill_color_;
+        std::optional<std::shared_ptr<Color>> border_color_;
+        std::optional<Unit> border_width_;
     };
 
     class BucketCommand : public Command
@@ -134,16 +134,36 @@ namespace paint
         virtual void Invoke(Image &im) override
         {
             std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
-            im.DrawBucket();
+            im.painter.DrawBucket(*point_, fill_color_);
         };
 
-        void AddFillColor(std::shared_ptr<Color> &&color) { fill_color_ = std::move(color); };
+        void AddFillColor(std::shared_ptr<Color> &&color) { fill_color_ = std::make_optional<std::shared_ptr<Color>>(std::move(color)); };
+        void AddFillColor(const Color &color) { fill_color_ = std::make_optional<std::shared_ptr<Color>>(color.clone()); };
 
     private:
         std::shared_ptr<BasePoint> point_;
 
         // Optional parameters
-        std::shared_ptr<Color> fill_color_;
+        std::optional<std::shared_ptr<Color>> fill_color_;
+    };
+
+    class CropCommand : public Command
+    {
+    public:
+        explicit CropCommand(std::shared_ptr<BasePoint> &&point1, std::shared_ptr<BasePoint> &&point2) : Command("CropCommand"),
+                                                                                                         point1_{std::move(point1)},
+                                                                                                         point2_{std::move(point2)} {};
+        virtual ~CropCommand(){};
+
+        virtual void Invoke(Image &im) override
+        {
+            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
+            im.painter.Crop(*point1_, *point2_);
+        };
+
+    private:
+        std::shared_ptr<BasePoint> point1_;
+        std::shared_ptr<BasePoint> point2_;
     };
 
     class ResizeCommand : public Command
@@ -155,7 +175,7 @@ namespace paint
         virtual void Invoke(Image &im) override
         {
             std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
-            im.Resize();
+            im.painter.Resize(*new_size_);
         };
 
     private:
@@ -172,7 +192,7 @@ namespace paint
         virtual void Invoke(Image &im) override
         {
             std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
-            im.Rotate();
+            im.painter.Rotate(rotation_);
         };
 
     private:
@@ -188,7 +208,7 @@ namespace paint
         virtual void Invoke(Image &im) override
         {
             std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
-            im.InvertColors();
+            im.painter.InvertColors();
         };
     };
 
@@ -201,27 +221,8 @@ namespace paint
         virtual void Invoke(Image &im) override
         {
             std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
-            im.ConvertToGrayscale();
+            im.painter.ConvertToGrayscale();
         };
-    };
-
-    class CropCommand : public Command
-    {
-    public:
-        explicit CropCommand(std::shared_ptr<BasePoint> &&point1, std::shared_ptr<BasePoint> &&point2) : Command("CropCommand"),
-                                                                                                         point1_{std::move(point1)},
-                                                                                                         point2_{std::move(point2)} {};
-        virtual ~CropCommand(){};
-
-        virtual void Invoke(Image &im) override
-        {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
-            im.Crop();
-        };
-
-    private:
-        std::shared_ptr<BasePoint> point1_;
-        std::shared_ptr<BasePoint> point2_;
     };
 
     class UndoCommand : public Command
