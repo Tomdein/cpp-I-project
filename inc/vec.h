@@ -65,6 +65,24 @@ namespace paint
     {
         return -(l.b * y + l.c) / l.a;
     }
+
+    struct Circle
+    {
+        Point center{0, 0};
+        Unit radius = 0;
+    };
+
+    // No bound checks
+    int circle_get_top_y(const Circle &c, const Unit &x)
+    {
+        return std::sqrt(std::pow(c.radius, 2) - std::pow(x - c.center.x, 2)) + c.center.y;
+    }
+
+    // No bound checks
+    int circle_get_bottom_y(const Circle &c, const Unit &x)
+    {
+        return -std::sqrt(std::pow(c.radius, 2) - std::pow(x - c.center.x, 2)) + c.center.y;
+    }
 }
 
 #endif // PAINT_INC_VEC_H_

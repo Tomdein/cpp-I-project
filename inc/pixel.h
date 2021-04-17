@@ -28,6 +28,16 @@ namespace paint
             return r == other.r && g == other.g && b == other.b;
         }
     };
+
+    struct PixelGrayscale
+    {
+        uint8_t w : 8;
+
+        bool operator==(const PixelGrayscale &other) const
+        {
+            return w == other.w;
+        }
+    };
 }
 
 #endif // PAINT_INC_PIXEL_H_
