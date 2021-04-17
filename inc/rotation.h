@@ -3,10 +3,14 @@
 
 namespace paint
 {
+    /**
+     * @brief Enum class signifying the rotation direction.
+     * 
+     */
     enum class Rotation
     {
-        kClock,
-        kCounterClock,
+        kClock,        /// Clockwise rotation.
+        kCounterClock, /// Counter clockwise rotation.
     };
 }
 

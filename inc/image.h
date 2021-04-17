@@ -12,7 +12,7 @@
 namespace paint
 {
     /**
-    * @brief Abtract class holding image data
+    * @brief Abtract class for image
     * 
     * Class Image provides interface for creating/loading/storing image data.
     * 
@@ -26,32 +26,60 @@ namespace paint
     class Image
     {
     public:
-        Image() : painter(callback_function_) {}
+        Image() : painter(std::bind(&Image::ImageEditCallback, this)) {}
 
-        Painter painter;
+        Painter painter; /// A painter used to edit the image.
 
-        void Redo(){};
-        void Undo(){};
+        /**
+         * @brief Moves back in history of edited image versions.
+         * 
+         * Stores the Image::image_data_ to the Image::image_data_redo_history_ and loads previous image from Image::image_data_undo_history_.
+         * If there is no image remaining in the Image::image_data_undo_history_, this function does nothing.
+         * 
+         */
+        void Undo();
+        /**
+         * @brief Moves redoes the previously undone image changes.
+         * 
+         * Stores the Image::image_data_ to the Image::image_data_undo_history_ and loads previously undone image from Image::image_data_redo_history_.
+         * If there is no image remaining in the Image::image_data_redo_history_, this function does nothing.
+         * 
+         */
+        void Redo();
 
         virtual void CreateImage() = 0;
         virtual void LoadImage() = 0;
         virtual void SaveImage() = 0;
 
+        /**
+         * @brief This method imforms Image that the data has been edited.
+         * 
+         * When the Image::painter edits the image data, it calls this callback so that Image knows the Image::image_data_ has been edited.
+         * 
+         */
         void ImageEditCallback();
 
     protected:
         File file_;
-        std::unique_ptr<DataPixels> image_data_;
-        std::deque<std::unique_ptr<DataPixels>> image_data_history_;
+        std::unique_ptr<DataPixels> image_data_;                          /// Stores the current image data.
+        std::deque<std::unique_ptr<DataPixels>> image_data_undo_history_; /// Stores the image history.
+        std::deque<std::unique_ptr<DataPixels>> image_data_redo_history_; /// Stores the previously undone images.
 
+        // TODO: get rid of has_fixed_size_ & has_image_
         bool has_fixed_size_ = false;
         bool has_image_ = false;
 
+        /**
+         * @brief Constant that sets thge size of the image history buffers.
+         * 
+         */
+        enum
+        {
+            kImageHistorySize = 10,
+        };
+
         virtual void CreateDataBuffer() = 0;
         virtual void GenerateMetadata() = 0;
-
-    private:
-        std::function<void()> callback_function_ = std::bind(&Image::ImageEditCallback, this);
     };
 }
 #endif // PAINT_INC_IMAGE_H_

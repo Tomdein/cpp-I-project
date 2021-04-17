@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "color.h"
+#include "colors.h"
 
 TEST(colorRGB565, colorConversion)
 {

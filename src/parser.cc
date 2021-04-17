@@ -11,6 +11,8 @@
 #include "rotation.h"
 #include "command.h"
 #include "parser.h"
+#include "color.h"
+#include "color_rgb888.h"
 
 namespace paint
 {
@@ -22,6 +24,25 @@ namespace paint
     const char *parse_error::error_substring() const noexcept
     {
         return error_substring_;
+    }
+
+    parse_error::parse_error(const char *error_substring)
+    {
+        std::strncpy(error_substring_, error_substring, kParseErrorSubstringLength);
+        error_substring_[kParseErrorSubstringLength - 1] = '\0';
+    }
+
+    parse_error::parse_error(const std::string &error_substring)
+    {
+        size_t n = error_substring.copy(error_substring_, kParseErrorSubstringLength);
+        if (n != kParseErrorSubstringLength)
+        {
+            error_substring_[n] = '\0';
+        }
+        else
+        {
+            error_substring_[kParseErrorSubstringLength] = '\0';
+        }
     }
 
     std::regex Parser::re_save_ = std::regex("^SAVE\\s([a-zA-Z0-9\\s\\\\/._-]+)$");

@@ -10,16 +10,20 @@ namespace paint
     namespace image_bmp
     {
 
+        /**
+         * @brief 'BM' signifying the file is BMP.
+         * 
+         */
         const uint16_t kBfType = 0x424dU;
 
         /**
-         * @brief Number of bit planes. Always 1 (historic reason)
+         * @brief Number of bit planes. Always 1 (historic reason).
          * 
          */
         const uint16_t kPlanes = 1;
 
         /**
-         * @brief Number of bits per pixel
+         * @brief Number of bits per pixel.
          * 
          */
         enum BiBitCount
@@ -31,7 +35,7 @@ namespace paint
         };
 
         /**
-         * @brief Comprimation method used
+         * @brief Comprimation method used.
          * 
          */
         enum BiCompression
