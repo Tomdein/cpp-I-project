@@ -260,7 +260,7 @@ namespace paint
         for (; it != it_end; it++, x++)
         {
             // Reached the end of line -> go to the 'beginning' (p1.x)
-            if (x == new_size.x)
+            if (x == p1.x + new_size.x)
             {
                 x = p1.x;
                 y++;
