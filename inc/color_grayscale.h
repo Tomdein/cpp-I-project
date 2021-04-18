@@ -17,7 +17,7 @@ namespace paint
     public:
         ColorGrayscale() = default;
         ColorGrayscale(uint8_t white);
-        virtual ~ColorGrayscale() {}
+        virtual ~ColorGrayscale() override {}
         virtual ColorGrayscale *clone() const override { return new ColorGrayscale{*this}; }
 
         ColorGrayscale(const ColorGrayscale &other) : pixel_{other.pixel_.w} {}

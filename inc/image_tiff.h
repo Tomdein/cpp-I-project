@@ -10,6 +10,7 @@ namespace paint
     {
     public:
         ImageTIFF() = default;
+        virtual ~ImageTIFF() override {}
 
         virtual void CreateImage() override {}
         virtual void LoadImage() override {}

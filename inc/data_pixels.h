@@ -21,7 +21,7 @@ namespace paint
     {
     public:
         error_data_mismatch() = default;
-        virtual ~error_data_mismatch() {}
+        virtual ~error_data_mismatch() override {}
 
         virtual const char *what() const noexcept override { return "Copying data with different underlying structure"; }
     };
@@ -58,7 +58,7 @@ namespace paint
             mempcpy(data_.get(), other.data_.get(), byte_count);
         }
 
-        ~DataPixels() = default;
+        ~DataPixels(){};
 
         // The data in iterator is not dereferencable. It is just a 'void *'
         class iterator
@@ -154,6 +154,17 @@ namespace paint
             pixel_struct_size_byte_ = new_color->GetDataSize();
             data_color_ = std::unique_ptr<Color>(new_color->clone());
             data_.swap(new_data);
+        }
+
+        Point GetSize() { return image_size_; }
+
+        void SwapData(DataPixels &other)
+        {
+            std::swap(pixel_struct_size_byte_, other.pixel_struct_size_byte_);
+            std::swap(image_size_, other.image_size_);
+            std::swap(pixel_count_, other.pixel_count_);
+            std::swap(data_color_, other.data_color_);
+            std::swap(data_, other.data_);
         }
 
     private:

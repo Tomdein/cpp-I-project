@@ -27,6 +27,7 @@ namespace paint
     {
     public:
         Image() : painter(std::bind(&Image::ImageEditCallback, this)) {}
+        virtual ~Image() {}
 
         Painter painter; /// A painter used to edit the image.
 
@@ -61,9 +62,10 @@ namespace paint
 
     protected:
         File file_;
-        std::unique_ptr<DataPixels> image_data_;                          /// Stores the current image data.
-        std::deque<std::unique_ptr<DataPixels>> image_data_undo_history_; /// Stores the image history.
-        std::deque<std::unique_ptr<DataPixels>> image_data_redo_history_; /// Stores the previously undone images.
+        std::shared_ptr<DataPixels> image_data_;                          /// Stores the current image data.
+        std::deque<std::shared_ptr<DataPixels>> image_data_undo_history_; /// Stores the image history.
+        std::deque<std::shared_ptr<DataPixels>> image_data_redo_history_; /// Stores the previously undone images.
+        std::unique_ptr<uint8_t[]> unprocessed_data;                      /// Storage for data before saving/loading pixel data from/to file.
 
         // TODO: get rid of has_fixed_size_ & has_image_
         bool has_fixed_size_ = false;
@@ -78,6 +80,7 @@ namespace paint
             kImageHistorySize = 10,
         };
 
+    private:
         virtual void CreateDataBuffer() = 0;
         virtual void GenerateMetadata() = 0;
     };

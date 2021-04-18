@@ -9,7 +9,7 @@ namespace paint
             return;
 
         // Get the data from the undo list
-        std::unique_ptr<DataPixels> new_data(std::move(image_data_undo_history_.front()));
+        std::shared_ptr<DataPixels> new_data(std::move(image_data_undo_history_.front()));
         image_data_undo_history_.pop_front();
 
         // Place current data to the redo list
@@ -23,6 +23,9 @@ namespace paint
 
         // Set the image from undo list as current
         image_data_.swap(new_data);
+
+        // Attach painter to the data
+        painter.AttachImageData(image_data_);
     }
 
     void Image::Redo()
@@ -32,7 +35,7 @@ namespace paint
             return;
 
         // Get the data from the redo list
-        std::unique_ptr<DataPixels> new_data(std::move(image_data_redo_history_.front()));
+        std::shared_ptr<DataPixels> new_data(std::move(image_data_redo_history_.front()));
         image_data_redo_history_.pop_front();
 
         // Place current data to the undo list
@@ -46,6 +49,9 @@ namespace paint
 
         // Set the image from redo list as current
         image_data_.swap(new_data);
+
+        // Attach painter to the data
+        painter.AttachImageData(image_data_);
     }
 
     void Image::ImageEditCallback()
@@ -53,7 +59,11 @@ namespace paint
         // Once the image is edited, throw away the redo history
         image_data_redo_history_.clear();
 
-        image_data_undo_history_.emplace_back(std::make_unique<DataPixels>(*image_data_));
+        // Duplicate the data
+        std::shared_ptr<DataPixels> data_copy = std::make_shared<DataPixels>(*image_data_);
+
+        // Save the duplicated data into history -> image_data_ is ready to be drawn on
+        image_data_undo_history_.emplace_back(std::move(data_copy));
 
         if (image_data_undo_history_.size() > kImageHistorySize)
         {

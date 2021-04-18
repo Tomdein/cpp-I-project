@@ -17,7 +17,7 @@ namespace paint
     public:
         ColorRGB888() = default;
         ColorRGB888(uint8_t red, uint8_t green, uint8_t blue) : pixel_{red, green, blue} {}
-        virtual ~ColorRGB888() {}
+        virtual ~ColorRGB888() override{};
         virtual ColorRGB888 *clone() const override { return new ColorRGB888{*this}; }
 
         ColorRGB888(const ColorRGB888 &other) : pixel_{other.pixel_.r, other.pixel_.g, other.pixel_.b} {}

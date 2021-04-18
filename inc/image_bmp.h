@@ -2,6 +2,7 @@
 #define PAINT_INC_IMAGE_BPM_H_
 
 #include <cstdint>
+#include <filesystem>
 
 #include "image.h"
 
@@ -13,8 +14,9 @@ namespace paint
         /**
          * @brief 'BM' signifying the file is BMP.
          * 
+         * TODO: endianess... little-endian -> 'MB'
          */
-        const uint16_t kBfType = 0x424dU;
+        const uint16_t kBfType = 0x4d42U;
 
         /**
          * @brief Number of bit planes. Always 1 (historic reason).
@@ -44,6 +46,8 @@ namespace paint
             kBiRLE8 = 1,
             kBiRLE4 = 2,
         };
+
+#pragma pack(1)
         struct HeaderBMP
         {
             uint16_t bf_type;
@@ -53,10 +57,11 @@ namespace paint
             uint32_t bf_offBits;
         };
 
+#pragma pack(1)
         struct HeaderBMPInfo
         {
             uint32_t bi_size;
-            uint32_t bi_widht;
+            uint32_t bi_width;
             uint32_t bi_height;
             uint16_t bi_planes;
             uint16_t bi_bitCount;
@@ -71,10 +76,15 @@ namespace paint
         class ImageBMP : public Image
         {
         public:
-            virtual void CreateImage() override {}
-            virtual void LoadImage() override {}
-            virtual void SaveImage() override {}
-            virtual void GenerateMetadata() override {}
+            ImageBMP(std::filesystem::path input_file_path)
+            {
+                file_ = File{FileType::kBMP, input_file_path};
+            }
+            virtual ~ImageBMP() override {}
+
+            virtual void CreateImage() override;
+            virtual void LoadImage() override;
+            virtual void SaveImage() override;
 
         private:
             HeaderBMP header_bmp_;
@@ -82,6 +92,9 @@ namespace paint
 
             bool CheckHeader();
             bool CheckHeaderInfo();
+
+            virtual void CreateDataBuffer() override;
+            virtual void GenerateMetadata() override;
         };
     }
 }

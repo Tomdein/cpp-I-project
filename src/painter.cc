@@ -269,7 +269,8 @@ namespace paint
             std::copy_n(reinterpret_cast<uint8_t *>((*dp)[y * image_size.x + x]), color_size_bytes, reinterpret_cast<uint8_t *>(*it));
         }
 
-        dp.swap(new_data_pixels);
+        // Swap the new and old data
+        dp->SwapData(*new_data_pixels);
 
         // Call back that image was edited
         image_edit_callback_();
@@ -337,7 +338,7 @@ namespace paint
         }
 
         // Swap the new and old data
-        dp.swap(new_data_pixels);
+        dp->SwapData(*new_data_pixels);
 
         // Call back that image was edited
         image_edit_callback_();
@@ -404,7 +405,8 @@ namespace paint
             }
         }
 
-        dp.swap(new_data_pixels);
+        // Swap the new and old data
+        dp->SwapData(*new_data_pixels);
 
         // Call back that image was edited
         image_edit_callback_();

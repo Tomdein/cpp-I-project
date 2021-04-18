@@ -13,10 +13,8 @@ namespace paint
         kBMP,
     };
 
-    class File
+    struct File
     {
-    public:
-    private:
         FileType file_type_;
         std::filesystem::path file_path_;
     };

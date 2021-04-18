@@ -19,7 +19,8 @@ namespace paint
     {
     public:
         Color() = default;
-        virtual ~Color() {}
+        virtual ~Color() = default;
+
         virtual Color *clone() const = 0;
 
         virtual ColorRGB565 ToRGB565() const = 0;

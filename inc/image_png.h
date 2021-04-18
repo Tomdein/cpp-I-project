@@ -31,6 +31,7 @@ namespace paint
         {
         public:
             ImagePNG() = default;
+            virtual ~ImagePNG() override {}
 
             virtual void CreateImage() override {}
             virtual void LoadImage() override {}

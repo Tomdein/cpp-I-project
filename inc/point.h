@@ -27,7 +27,7 @@ namespace paint
     {
     public:
         BasePoint() = default;
-        virtual ~BasePoint(){};
+        virtual ~BasePoint() {}
 
         /**
          * @brief GetPointPX returns the point in image.
@@ -45,8 +45,8 @@ namespace paint
     class PointPX : public BasePoint
     {
     public:
-        PointPX(int32_t x, int32_t y) : point_{x, y} {};
-        virtual ~PointPX(){};
+        PointPX(int32_t x, int32_t y) : point_{x, y} {}
+        virtual ~PointPX() override {}
 
         /**
          * @brief GetPointPX returns the point in image.
@@ -71,7 +71,7 @@ namespace paint
     {
     public:
         PointPer(float x, float y) : x_(x), y_(y){};
-        virtual ~PointPer(){};
+        virtual ~PointPer() override {}
 
         /**
          * @brief GetPointPX returns the point in image.

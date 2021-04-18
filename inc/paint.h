@@ -21,6 +21,7 @@ namespace paint
     {
     public:
         Paint() = default;
+        virtual ~Paint() {}
 
         /**
          * @brief Starts the paint app.
@@ -44,7 +45,8 @@ namespace paint
     class PaintCLI : public Paint
     {
     public:
-        PaintCLI(){};
+        PaintCLI() {}
+        virtual ~PaintCLI() override {}
 
         /**
          * @brief Prints help information into terminal.
@@ -70,6 +72,7 @@ namespace paint
     {
     public:
         PaintBatch(std::filesystem::path &input_file_path) : commands_file_path_{input_file_path} {}
+        virtual ~PaintBatch() override {}
 
         /**
          * @brief Starts the batch paint app.
@@ -95,6 +98,7 @@ namespace paint
                                                                                                                      output_file_path_{output_file_path}
         {
         }
+        virtual ~PaintFile() override {}
 
         /**
          * @brief Starts the file paint app.
