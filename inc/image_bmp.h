@@ -57,7 +57,6 @@ namespace paint
             uint32_t bf_offBits;
         };
 
-#pragma pack(1)
         struct HeaderBMPInfo
         {
             uint32_t bi_size;
@@ -72,6 +71,7 @@ namespace paint
             uint32_t bi_clrUsed;
             uint32_t bi_clrImportant;
         };
+#pragma pack()
 
         class ImageBMP : public Image
         {
