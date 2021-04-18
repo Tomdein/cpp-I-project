@@ -102,7 +102,7 @@ namespace paint
         }
 
         iterator begin() { return iterator(data_.get(), pixel_struct_size_byte_); }
-        iterator end() { return iterator(data_.get() + pixel_count_, pixel_struct_size_byte_); }
+        iterator end() { return iterator(data_.get() + pixel_count_ * pixel_struct_size_byte_, pixel_struct_size_byte_); }
 
         void CopyData(DataPixels &other)
         {
