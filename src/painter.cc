@@ -230,8 +230,8 @@ namespace paint
         Point c2 = corner2.GetPointPX(dp->image_size_);
 
         // Set p1 as the top left point and p2 as the bottom right point
-        Point p1{std::min(c1.x, c2.y), std::min(c1.y, c2.y)};
-        Point p2{std::max(c1.x, c2.y), std::max(c1.y, c2.y)};
+        Point p1{std::min(c1.x, c2.x), std::min(c1.y, c2.y)};
+        Point p2{std::max(c1.x, c2.x), std::max(c1.y, c2.y)};
 
         // Both points are out of the bound -> error
         if (p1.x > image_size.x || p1.y > image_size.y || p2.x < 0 || p2.y < 0)
@@ -304,9 +304,9 @@ namespace paint
         std::shared_ptr<Color> c_interp_bottom(dp->GetColorType().release());
         std::shared_ptr<Color> c_interp_top(dp->GetColorType().release());
 
-        for (int y = 0; y != image_size.y; y++)
+        for (int y = 0; y != new_image_size.y; y++)
         {
-            for (int x = 0; x != image_size.y; x++)
+            for (int x = 0; x != new_image_size.x; x++)
             {
                 point_in_old = vec2f{x * multiplier.u, y * multiplier.v};
 
@@ -360,8 +360,8 @@ namespace paint
 
         int pixel_count = image_size.x * image_size.y;
 
-        // Clockwise rotation
-        if (rotation == Rotation::kClock)
+        // Counter Clockwise rotation
+        if (rotation == Rotation::kCounterClock)
         {
             // Go up from bottom left, then to the right (inside old image)
             int idx = image_size.x * (image_size.y - 1);
@@ -382,7 +382,7 @@ namespace paint
                 std::copy_n(reinterpret_cast<uint8_t *>((*dp)[idx]), color_size_bytes, reinterpret_cast<uint8_t *>(*it));
             }
         }
-        // Counter clockwise rotation
+        // Clockwise rotation
         else
         {
             // Go down from top right, then one to the left

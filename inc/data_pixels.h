@@ -91,7 +91,7 @@ namespace paint
             size_t pixel_struct_size_byte_;
         };
 
-        void *operator[](size_t pos) { return &data_[pos]; }
+        void *operator[](size_t pos) { return &data_[pos * pixel_struct_size_byte_]; }
         void *at(Unit x, Unit y)
         {
             if (x >= image_size_.x || y >= image_size_.y)
