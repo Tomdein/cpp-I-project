@@ -394,7 +394,7 @@ namespace paint
                     idx = idx - pixel_count - 1;
 
                 // Reached bottom left pixel of old image -> end
-                if (idx == pixel_count - image_size.x + 1)
+                if (idx == pixel_count - image_size.x)
                 {
                     std::copy_n(reinterpret_cast<uint8_t *>((*dp)[idx]), color_size_bytes, reinterpret_cast<uint8_t *>(*it));
                     break;
