@@ -159,11 +159,11 @@ namespace paint
         int pixel_count = image_size.x * image_size.y;
 
         // Point outside of image, nothing to do
-        if (p.x > image_size.x || p.y > image_size.y)
+        if (p.x < 0 || p.x >= image_size.x || p.y < 0 || p.y >= image_size.y)
             return;
 
-        std::vector<int> pixels_to_search(40);
-        std::vector<int> pixels_to_change(40);
+        std::vector<int> pixels_to_search;
+        std::vector<int> pixels_to_change;
         pixels_to_change.push_back(p.y * dp->image_size_.x + p.x);
 
         std::unique_ptr<Color> picked_color(dp->GetColorType());
@@ -178,6 +178,7 @@ namespace paint
             std::for_each(pixels_to_change.begin(), pixels_to_change.end(), [&](auto &i) {
                 // Change the color of the pixel to fill_color
                 std::copy_n(reinterpret_cast<uint8_t *>(fill_data_ptr), color_size_bytes, reinterpret_cast<uint8_t *>((*dp)[i]));
+                image_edit_callback_(); // TESTING
             });
 
             // Clear pixels_to_search
@@ -189,22 +190,22 @@ namespace paint
             {
                 // Check right pixel
                 idx = p + 1;
-                if (idx < pixel_count && std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
+                if (idx < pixel_count && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
                     pixels_to_search.push_back(idx);
 
                 // Check left pixel
                 idx -= 2;
-                if (idx > 0 && std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
+                if (idx > 0 && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
                     pixels_to_search.push_back(idx);
 
                 // Check top pixel
                 idx = p - image_size.x;
-                if (idx > 0 && std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
+                if (idx > 0 && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
                     pixels_to_search.push_back(idx);
 
                 // Check top pixel
                 idx = p + image_size.x;
-                if (idx > pixel_count && std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
+                if (idx < pixel_count && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
                     pixels_to_search.push_back(idx);
             }
 
@@ -226,6 +227,7 @@ namespace paint
         std::shared_ptr<DataPixels> dp = image_data_.lock();
         Point image_size = dp->image_size_;
 
+        // Retrieve unit in PX
         Point c1 = corner1.GetPointPX(dp->image_size_);
         Point c2 = corner2.GetPointPX(dp->image_size_);
 
@@ -233,8 +235,8 @@ namespace paint
         Point p1{std::min(c1.x, c2.x), std::min(c1.y, c2.y)};
         Point p2{std::max(c1.x, c2.x), std::max(c1.y, c2.y)};
 
-        // Both points are out of the bound -> error
-        if (p1.x > image_size.x || p1.y > image_size.y || p2.x < 0 || p2.y < 0)
+        // Both points are out of the bound -> error (|| because p1 should be the left top point and p2 should be bottom right point)
+        if ((p1.x > image_size.x && p1.y > image_size.y) || (p2.x < 0 && p2.y < 0))
             throw;
 
         // If p1 is to the left or above the image -> move to the edge
@@ -266,7 +268,8 @@ namespace paint
                 y++;
             }
 
-            std::copy_n(reinterpret_cast<uint8_t *>((*dp)[y * image_size.x + x]), color_size_bytes, reinterpret_cast<uint8_t *>(*it));
+            size_t idx = y * image_size.x + x;
+            std::copy_n(reinterpret_cast<uint8_t *>((*dp)[idx]), color_size_bytes, reinterpret_cast<uint8_t *>(*it));
         }
 
         // Swap the new and old data

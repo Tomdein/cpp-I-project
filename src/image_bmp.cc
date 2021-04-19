@@ -85,7 +85,8 @@ namespace paint
                 file.exceptions(std::ios_base::failbit | std::ios_base::badbit | std::ios_base::eofbit);
 
                 // Open file
-                file.open("../../images/rotated.png", std::ios::binary);
+                //file.open("../../images/rotated.png", std::ios::binary);
+                file.open(file_.file_path_, std::ios::binary);
 
                 // Read BMP headers
                 file.write(reinterpret_cast<char *>(&header_bmp_), sizeof(HeaderBMP));
@@ -104,7 +105,30 @@ namespace paint
                     data_size = header_bmp_info_.bi_sizeImage;
                 }
 
-                // Create pixel data buffer and read pixel data
+                // How many bits after 4byte alignment
+                int four_byte_align = header_bmp_info_.bi_bitCount * header_bmp_info_.bi_width % 32;
+                // How many remainning bits to 4byte alignment
+                if (four_byte_align != 0)
+                {
+                    four_byte_align = 32 - four_byte_align;
+
+                    // How many remainning bytes to 4byte alignment, discarding the first incomplete byte, which will be copied when copying by line
+                    four_byte_align = four_byte_align / 8;
+                }
+
+                int padding = 0;
+                for (size_t y = 0; y < header_bmp_info_.bi_height; y++)
+                {
+                    file.write(reinterpret_cast<char *>((*image_data_)[y * header_bmp_info_.bi_width]),
+                               std::ceil(header_bmp_info_.bi_width * static_cast<float>(header_bmp_info_.bi_bitCount) / 8));
+
+                    if (four_byte_align)
+                    {
+                        file.write(reinterpret_cast<char *>(&padding), four_byte_align);
+                    }
+                }
+
+                // Write pixel data
                 file.write(reinterpret_cast<char *>(*image_data_->begin()), data_size);
 
                 file.close();
@@ -205,6 +229,26 @@ namespace paint
             header_bmp_info_.bi_sizeImage = image_data_->GetSize().x * image_data_->GetSize().y * image_data_->GetColorType()->GetDataSize(); // Uncompressed size
             header_bmp_info_.bi_clrUsed = 0;
             header_bmp_info_.bi_clrImportant = 0;
+        }
+
+        void ImageBMP::SaveBuffer()
+        {
+            int idx = image_data_undo_history_.size() - 1;
+            std::filesystem::create_directory("./image_dump");
+
+            for (auto &img : this->image_data_undo_history_)
+            {
+                image_data_ = (img);
+
+                std::stringstream s;
+                s.str(std::string());
+                s << "./image_dump/img_" << idx << ".bmp";
+                file_ = File{FileType::kBMP, s.str()};
+
+                SaveImage();
+
+                idx++;
+            }
         }
     }
 
