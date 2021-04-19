@@ -78,7 +78,7 @@ namespace paint
         public:
             ImageBMP(std::filesystem::path input_file_path)
             {
-                file_ = File{FileType::kBMP, input_file_path};
+                file_in_ = File{FileType::kBMP, input_file_path};
             }
             virtual ~ImageBMP() override {}
 

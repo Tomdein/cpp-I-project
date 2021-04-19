@@ -53,6 +53,12 @@ namespace paint
         virtual void SaveImage() = 0;
 
         /**
+         * @brief Sets the output image path
+         * 
+         */
+        void SetOutputImage(const File &file_out) { file_out_ = file_out; }
+
+        /**
          * @brief This method imforms Image that the data has been edited.
          * 
          * When the Image::painter edits the image data, it calls this callback so that Image knows the Image::image_data_ has been edited.
@@ -61,7 +67,8 @@ namespace paint
         void ImageEditCallback();
 
     protected:
-        File file_;
+        File file_in_;
+        File file_out_;
         std::shared_ptr<DataPixels> image_data_;                          /// Stores the current image data.
         std::deque<std::shared_ptr<DataPixels>> image_data_undo_history_; /// Stores the image history.
         std::deque<std::shared_ptr<DataPixels>> image_data_redo_history_; /// Stores the previously undone images.
@@ -77,7 +84,7 @@ namespace paint
          */
         enum
         {
-            kImageHistorySize = 10,
+            kImageHistorySize = 5000,
         };
 
     private:

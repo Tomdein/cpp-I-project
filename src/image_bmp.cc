@@ -20,8 +20,8 @@ namespace paint
                 // Set file to throw exceptions
                 file.exceptions(std::ios_base::failbit | std::ios_base::badbit | std::ios_base::eofbit);
 
-                // Open file
-                file.open(file_.file_path_, std::ios::binary);
+                // Open input file
+                file.open(file_in_.file_path_, std::ios::binary);
 
                 // Read BMP headers
                 file.read(reinterpret_cast<char *>(&header_bmp_), sizeof(HeaderBMP));
@@ -84,9 +84,8 @@ namespace paint
                 // Set file to throw exceptions
                 file.exceptions(std::ios_base::failbit | std::ios_base::badbit | std::ios_base::eofbit);
 
-                // Open file
-                //file.open("../../images/rotated.png", std::ios::binary);
-                file.open(file_.file_path_, std::ios::binary);
+                // Open output file
+                file.open(file_out_.file_path_, std::ios::binary);
 
                 // Read BMP headers
                 file.write(reinterpret_cast<char *>(&header_bmp_), sizeof(HeaderBMP));
@@ -233,7 +232,7 @@ namespace paint
 
         void ImageBMP::SaveBuffer()
         {
-            int idx = image_data_undo_history_.size() - 1;
+            int idx = 0;
             std::filesystem::create_directory("./image_dump");
 
             for (auto &img : this->image_data_undo_history_)
@@ -243,7 +242,7 @@ namespace paint
                 std::stringstream s;
                 s.str(std::string());
                 s << "./image_dump/img_" << idx << ".bmp";
-                file_ = File{FileType::kBMP, s.str()};
+                file_out_ = File{FileType::kBMP, s.str()};
 
                 SaveImage();
 

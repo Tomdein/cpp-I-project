@@ -178,8 +178,8 @@ namespace paint
             std::for_each(pixels_to_change.begin(), pixels_to_change.end(), [&](auto &i) {
                 // Change the color of the pixel to fill_color
                 std::copy_n(reinterpret_cast<uint8_t *>(fill_data_ptr), color_size_bytes, reinterpret_cast<uint8_t *>((*dp)[i]));
-                image_edit_callback_(); // TESTING
             });
+            image_edit_callback_(); // TESTING
 
             // Clear pixels_to_search
             pixels_to_search.clear();
@@ -190,12 +190,12 @@ namespace paint
             {
                 // Check right pixel
                 idx = p + 1;
-                if (idx < pixel_count && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
+                if (idx < pixel_count && p % image_size.x != image_size.x - 1 && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
                     pixels_to_search.push_back(idx);
 
                 // Check left pixel
                 idx -= 2;
-                if (idx > 0 && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
+                if (idx > 0 && p % image_size.x != 0 && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
                     pixels_to_search.push_back(idx);
 
                 // Check top pixel
