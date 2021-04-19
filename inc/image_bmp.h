@@ -86,6 +86,8 @@ namespace paint
             virtual void LoadImage() override;
             virtual void SaveImage() override;
 
+            void SaveBuffer();
+
         private:
             HeaderBMP header_bmp_;
             HeaderBMPInfo header_bmp_info_;
