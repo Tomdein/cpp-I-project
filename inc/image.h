@@ -67,8 +67,8 @@ namespace paint
         void ImageEditCallback();
 
     protected:
-        File file_in_;
-        File file_out_;
+        File file_in_;                                                    /// File to read from
+        File file_out_;                                                   /// File to write to when saving image (via SaveImage)
         std::shared_ptr<DataPixels> image_data_;                          /// Stores the current image data.
         std::deque<std::shared_ptr<DataPixels>> image_data_undo_history_; /// Stores the image history.
         std::deque<std::shared_ptr<DataPixels>> image_data_redo_history_; /// Stores the previously undone images.
@@ -84,7 +84,7 @@ namespace paint
          */
         enum
         {
-            kImageHistorySize = 5000,
+            kImageHistorySize = 500,
         };
 
     private:

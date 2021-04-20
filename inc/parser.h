@@ -52,7 +52,7 @@ namespace paint
          */
         enum
         {
-            kParseErrorSubstringLength = 256,
+            kParseErrorSubstringLength = 256, /// Maximum length of the substring.
         };
 
         char error_substring_[kParseErrorSubstringLength]; /// Array storing error command text

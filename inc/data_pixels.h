@@ -27,9 +27,9 @@ namespace paint
     };
 
     /**
-     * @brief A class used for storing and access of pixel data
+     * @brief A class used for storing and access of the pixel data
      * 
-     * This class is used for storing and access of pixel data without any color information, just the size of a single pixel.
+     * This class is used for storing and access of the pixel data without any color information, just the size of a single pixel.
      * 
      * DataPixels gives the option to access the underlying pixels with DataPixels::operator[] or DataPixels::at().
      * DataPixels::at() performs bounds checking and throws std::out_of_range if arguments are out of bounds.
@@ -61,6 +61,10 @@ namespace paint
         ~DataPixels(){};
 
         // The data in iterator is not dereferencable. It is just a 'void *'
+        /**
+         * @brief A DataPixels iterator.
+         * 
+         */
         class iterator
         {
         public:
@@ -87,11 +91,26 @@ namespace paint
             bool operator!=(const iterator &other) { return !(*this == other); }
 
         private:
-            uint8_t *ptr_;
-            size_t pixel_struct_size_byte_;
+            uint8_t *ptr_;                  /// Pointer to the current position in pixel data.
+            size_t pixel_struct_size_byte_; /// Size of a single pixel in bytes.
         };
 
+        /**
+         * @brief A random access operator for pixels in DataPixels.
+         * 
+         * @param pos the position of pixels (represented as linear array of pixels).
+         * @return void* pointer to the pixel at \ref pos.
+         */
         void *operator[](size_t pos) { return &data_[pos * pixel_struct_size_byte_]; }
+        /**
+         * @brief A random access method with position as coordinates.
+         * 
+         * This method does a bounds check and throws if coordinates are out of bounds.
+         * 
+         * @param x the x coordinate of pixel.
+         * @param y the y coordinate of pixel.
+         * @return void* pointer to the pixel at (x, y).
+         */
         void *at(Unit x, Unit y)
         {
             if (x >= image_size_.x || y >= image_size_.y)
@@ -101,36 +120,64 @@ namespace paint
             return &data_[x * image_size_.x + y];
         }
 
+        /**
+         * @brief Returns the iterator to the beginning of the DataPixels.
+         * 
+         * @return iterator to the beginning of the DataPixels.
+         */
         iterator begin() { return iterator(data_.get(), pixel_struct_size_byte_); }
+        /**
+         * @brief Returns the iterator to the one pixel after the end of the DataPixels.
+         * 
+         * @return iterator to the one after the last pixel of the DataPixels.
+         */
         iterator end() { return iterator(data_.get() + pixel_count_ * pixel_struct_size_byte_, pixel_struct_size_byte_); }
 
+        /**
+         * @brief Coppies data from another DataPixels.
+         * 
+         * If \ref other does not have the same size of the data or different size of pixel
+         * then this method throws \ref error_data_mismatch.
+         * 
+         * @param other where to copy the data from.
+         */
         void CopyData(DataPixels &other)
         {
+            // Other does not have the same size of the data or different size of pixel -> throw
             if ((pixel_struct_size_byte_ != other.pixel_struct_size_byte_) || (pixel_count_ != other.pixel_count_))
                 throw error_data_mismatch();
 
-            // std::copy(other.begin(), other.end(), this->begin()); // Iterator needs to be derived from RandomAccessIterator
+            // Copy all the data
             std::copy_n(reinterpret_cast<uint8_t *>(other.data_.get()), pixel_struct_size_byte_ * pixel_count_, reinterpret_cast<uint8_t *>(data_.get()));
-
-            // iterator this_it = this->begin();
-            // iterator other_it = other.begin();
-
-            // //remove loop!!!
-            // for (; this_it != this->end(); this_it++)
-            // {
-            //     //std::memcpy(*this_it, *other_it, pixel_struct_size_byte_);
-            // }
         }
 
+        /**
+         * @brief Get the Color.
+         * 
+         * Returns a clone of Color instance associated with this DataPixels.
+         * 
+         * @return std::unique_ptr<Color> a clone of Color instance.
+         */
         std::unique_ptr<Color> GetColorType() { return std::unique_ptr<Color>(data_color_->clone()); }
 
+        /**
+         * @brief Transforms DataPixels to new color type.
+         * 
+         * Allocates space for new pixel data and then transforms each pixel to the new color.
+         * 
+         * @param new_color \ref Color to tranform to.
+         */
         void TransformToColorType(const std::unique_ptr<Color> &new_color)
         {
 
+            // Allocate space for pixel data
             std::unique_ptr<uint8_t[]> new_data(new uint8_t[pixel_count_]);
+
+            // Create iterators to old pixel data
             iterator it_old = begin();
             iterator it_old_end = end();
 
+            // Create iterator to new pixel data
             size_t new_pixel_size = new_color->GetDataSize();
             iterator it_new(new_data.get(), new_pixel_size);
 
@@ -140,24 +187,34 @@ namespace paint
             void *old_color_data_ptr = data_color_->GetData();
             void *new_color_data_ptr = new_color->GetData();
 
+            // For each pixel: load the color, tranform the color and then save the color
             for (; it_old != it_old_end; it_old++, it_new++)
             {
-                // memcpy(old_color_data_ptr, *it_old, pixel_struct_size_byte_);
-
                 std::copy_n(reinterpret_cast<uint8_t *>(*it_old), pixel_struct_size_byte_, reinterpret_cast<uint8_t *>(old_color_data_ptr));
                 new_color->SetColor(*data_color_);
                 std::copy_n(reinterpret_cast<uint8_t *>(new_color_data_ptr), new_pixel_size, reinterpret_cast<uint8_t *>(*it_new));
-
-                // memcpy(*it_new, new_color_data_ptr, new_pixel_size);
             }
 
+            // Update the DataPixels to new color type
             pixel_struct_size_byte_ = new_color->GetDataSize();
             data_color_ = std::unique_ptr<Color>(new_color->clone());
+
+            // Swap the old data of DataPixels with new data
             data_.swap(new_data);
         }
 
+        /**
+         * @brief Get the dimensions of data.
+         * 
+         * @return Point dimensions of DataPixels.
+         */
         Point GetSize() { return image_size_; }
 
+        /**
+         * @brief Swaps the DataPixel objects.
+         * 
+         * @param other the other DataPixel to swap data with.
+         */
         void SwapData(DataPixels &other)
         {
             std::swap(pixel_struct_size_byte_, other.pixel_struct_size_byte_);
@@ -168,12 +225,13 @@ namespace paint
         }
 
     private:
-        size_t pixel_struct_size_byte_;
-        Point image_size_;
-        size_t pixel_count_;
-        std::unique_ptr<Color> data_color_;
-        std::unique_ptr<uint8_t[]> data_;
+        size_t pixel_struct_size_byte_;     /// Size of single pixel.
+        Point image_size_;                  /// Dimensions of pixel data (rows, columns).
+        size_t pixel_count_;                /// Number of total pixels.
+        std::unique_ptr<Color> data_color_; /// Color type associated with this DataPixels.
+        std::unique_ptr<uint8_t[]> data_;   /// Pointer to pixel data.
 
+        // The Painter can edit PixelData
         friend class Painter;
     };
 }

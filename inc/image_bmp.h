@@ -30,10 +30,10 @@ namespace paint
          */
         enum BiBitCount
         {
-            k1bpPX = 1,
-            k4bpPX = 4,
-            k8bpPX = 8,
-            k24bpPX = 24,
+            k1bpPX = 1,   /// 1 bit per pixel
+            k4bpPX = 4,   /// 4 bits per pixel
+            k8bpPX = 8,   /// 8 bits per pixel
+            k24bpPX = 24, /// 24 bits per pixel
         };
 
         /**
@@ -47,32 +47,52 @@ namespace paint
             kBiRLE4 = 2,
         };
 
+// Set the alignment of headers to 1 byte
 #pragma pack(1)
+
+        /**
+         * @brief Bitmap file header.
+         * 
+         */
         struct HeaderBMP
         {
-            uint16_t bf_type;
-            uint32_t bf_size;
-            uint16_t bf_reserved1;
-            uint16_t bf_reserved2;
-            uint32_t bf_offBits;
+            uint16_t bf_type;      /// Identifies the file as BMP ('B','M').
+            uint32_t bf_size;      /// Size of BMP file in bytes.
+            uint16_t bf_reserved1; /// Reserved.
+            uint16_t bf_reserved2; /// Reserved.
+            uint32_t bf_offBits;   /// Offset (starting address) of pixel data.
         };
 
+        /**
+         * @brief Bitmap info header.
+         * 
+         */
         struct HeaderBMPInfo
         {
-            uint32_t bi_size;
-            uint32_t bi_width;
-            uint32_t bi_height;
-            uint16_t bi_planes;
-            uint16_t bi_bitCount;
-            uint32_t bi_compression;
-            uint32_t bi_sizeImage;
-            uint32_t bi_xPelsPerMeter;
-            uint32_t bi_yPelsPerMeter;
-            uint32_t bi_clrUsed;
-            uint32_t bi_clrImportant;
+            uint32_t bi_size;          /// Size of this header in bytes.
+            uint32_t bi_width;         /// Width of bitmap in pixels.
+            uint32_t bi_height;        /// Height of bitmap in pixels.
+            uint16_t bi_planes;        /// Number of color planes (MUST be zero).
+            uint16_t bi_bitCount;      /// Number of bits per pixel (color depth of the image).
+            uint32_t bi_compression;   /// Compression method (see BiCompression).
+            uint32_t bi_sizeImage;     /// Size of bitmap data (for BiCompression::kBiRGB can be 0).
+            uint32_t bi_xPelsPerMeter; /// Horizontal resolution of the image (ppm - pixels per metre).
+            uint32_t bi_yPelsPerMeter; /// Vertical resolution of the image (ppm - pixels per metre).
+            uint32_t bi_clrUsed;       /// Number of colors in the color palette (0 as default for 2^n).
+            uint32_t bi_clrImportant;  /// The number of important colors used (0 when every color is important). This is generaly ignored.
         };
+
+// Reset to default alignment
 #pragma pack()
 
+        /**
+         * @brief A class that represents a BMP image.
+         * 
+         * Each instance of this class represents a separate BMP image.
+         * 
+         * For editing a image go see class Image.
+         * 
+         */
         class ImageBMP : public Image
         {
         public:
@@ -82,20 +102,63 @@ namespace paint
             }
             virtual ~ImageBMP() override {}
 
+            /**
+             * @brief Create an empty BMP image.
+             * 
+             */
             virtual void CreateImage() override;
+
+            /**
+             * @brief Load a BMP image from file.
+             * 
+             */
             virtual void LoadImage() override;
+
+            /**
+             * @brief Save the data into a BMP image.
+             * 
+             */
             virtual void SaveImage() override;
 
+            /**
+             * @brief Saves all images from history.
+             * 
+             */
             void SaveBuffer();
 
         private:
-            HeaderBMP header_bmp_;
-            HeaderBMPInfo header_bmp_info_;
+            HeaderBMP header_bmp_;          /// BMP header struct.
+            HeaderBMPInfo header_bmp_info_; /// BMP info header struct.
 
+            /**
+             * @brief Checks if \ref header_bmp is valid.
+             * 
+             * @return true if \ref header_bmp is valid.
+             * @return false if \ref header_bmp is invalid.
+             */
             bool CheckHeader();
+
+            /**
+             * @brief Checks if \ref header_bmp_info_ is valid.
+             * 
+             * @return true if \ref header_bmp_info_ is valid.
+             * @return false if \ref header_bmp_info_ is invalid.
+             */
             bool CheckHeaderInfo();
 
+            /**
+             * @brief Create a data tructure for image pixels.
+             * 
+             */
             virtual void CreateDataBuffer() override;
+
+            /**
+             * @brief Generates new headers.
+             * 
+             * Takes the info in data buffer Image::image_data_ 
+             * and updates the headers \ref header_bmp & \ref header_bmp_info_
+             * 
+             */
             virtual void GenerateMetadata() override;
         };
     }
