@@ -2,7 +2,7 @@
 #include "unit.h"
 #include "vec.h"
 
-#include <vector>
+#include <set>
 #include <cstring>
 
 namespace paint
@@ -162,12 +162,13 @@ namespace paint
         if (p.x < 0 || p.x >= image_size.x || p.y < 0 || p.y >= image_size.y)
             return;
 
-        std::vector<int> pixels_to_search;
-        std::vector<int> pixels_to_change;
-        pixels_to_change.push_back(p.y * dp->image_size_.x + p.x);
+        std::set<int> pixels_to_search;
+        std::set<int> pixels_to_change;
+        int first_idx = p.y * dp->image_size_.x + p.x;
+        pixels_to_change.insert(first_idx);
 
         std::unique_ptr<Color> picked_color(dp->GetColorType());
-        picked_color->SetFromData((*dp)[pixels_to_change.front()]);
+        picked_color->SetFromData((*dp)[first_idx]);
         size_t color_size_bytes(picked_color->GetDataSize());
 
         void *fill_data_ptr = fill_color.value_or(next_command_color_)->GetData();
@@ -178,8 +179,8 @@ namespace paint
             std::for_each(pixels_to_change.begin(), pixels_to_change.end(), [&](auto &i) {
                 // Change the color of the pixel to fill_color
                 std::copy_n(reinterpret_cast<uint8_t *>(fill_data_ptr), color_size_bytes, reinterpret_cast<uint8_t *>((*dp)[i]));
+                image_edit_callback_(); // TESTING
             });
-            image_edit_callback_(); // TESTING
 
             // Clear pixels_to_search
             pixels_to_search.clear();
@@ -191,22 +192,22 @@ namespace paint
                 // Check right pixel
                 idx = p + 1;
                 if (idx < pixel_count && p % image_size.x != image_size.x - 1 && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
-                    pixels_to_search.push_back(idx);
+                    pixels_to_search.insert(idx);
 
                 // Check left pixel
                 idx -= 2;
                 if (idx > 0 && p % image_size.x != 0 && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
-                    pixels_to_search.push_back(idx);
+                    pixels_to_search.insert(idx);
 
                 // Check top pixel
                 idx = p - image_size.x;
                 if (idx > 0 && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
-                    pixels_to_search.push_back(idx);
+                    pixels_to_search.insert(idx);
 
                 // Check top pixel
                 idx = p + image_size.x;
                 if (idx < pixel_count && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
-                    pixels_to_search.push_back(idx);
+                    pixels_to_search.insert(idx);
             }
 
             // After changing all the pixels and searching new pixels to replace, swap pixels_to_search & pixels_to_change
