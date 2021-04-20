@@ -49,7 +49,7 @@ namespace paint
 
 
 )!!!";
-    }
+    } // PrintHelp end
 
     void PaintCLI::Run()
     {
@@ -71,13 +71,17 @@ To To view help write -h or --help
 
         while (!exit)
         {
+            // Read a line
             std::getline(std::cin, line);
 
+            // If input is '-h' or '--help' -> show help and continue;
             if ((line == "-h") || (line == "--help"))
             {
                 PaintCLI::PrintHelp();
+                continue;
             }
 
+            // Try parsing the input as command
             try
             {
                 commands_.emplace_back(std::move(parser_.ParseLine(line)));

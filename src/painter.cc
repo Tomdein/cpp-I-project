@@ -26,7 +26,6 @@ namespace paint
         Point l_start = start.GetPointPX(dp->image_size_);
         Point l_end = end.GetPointPX(dp->image_size_);
         std::shared_ptr<Color> l_color = line_color_.value_or(next_command_color_);
-        //Unit l_width = line_width_.value_or(1);
         float l_width_half = line_width_.value_or(1) / 2.0f;
 
         // TODO reverse the vector if it is in direction of [-1,-1]. It would break the algorithm if THE loop
@@ -82,11 +81,13 @@ namespace paint
         std::shared_ptr<DataPixels> dp = image_data_.lock();
         Point image_size = dp->image_size_;
 
+        // Get parameters
         Point cen = center.GetPointPX(image_size);
         std::shared_ptr<Color> fill_c(fill_color.value_or(next_command_color_));
         std::shared_ptr<Color> border_c(border_color.value_or(next_command_color_));
         Unit border_w = border_width.value_or(1);
 
+        // Create circles
         Circle c_outer{cen, radius + static_cast<int>(std::round(static_cast<float>(border_w) / 2.0f))};
         Circle c_inner{cen, radius - static_cast<int>(std::round(static_cast<float>(border_w) / 2.0f))};
 
@@ -98,6 +99,8 @@ namespace paint
 
         // Set y1 to y coordinate of circle
         y1 = c_outer.center.y;
+
+        // Color circular segments to the left and right
         for (Unit x = x1; x < x2; x++)
         {
             // Get max y
@@ -106,6 +109,7 @@ namespace paint
             // TODO: y < y2 or y <= y2
             for (Unit y = y1; y < y2; y++)
             {
+                // Use symetry to color the 4 pixels
                 std::copy_n(reinterpret_cast<uint8_t *>(border_c->GetData()), border_c->GetDataSize(), reinterpret_cast<uint8_t *>((*dp)[y * image_size.x + x]));
                 std::copy_n(reinterpret_cast<uint8_t *>(border_c->GetData()), border_c->GetDataSize(), reinterpret_cast<uint8_t *>((*dp)[y * image_size.x + (c_outer.center.x << 2) - x]));
                 std::copy_n(reinterpret_cast<uint8_t *>(border_c->GetData()), border_c->GetDataSize(), reinterpret_cast<uint8_t *>((*dp)[((c_outer.center.y << 2) - y) * image_size.x + x]));
@@ -113,6 +117,7 @@ namespace paint
             }
         }
 
+        // Color the rest of the circle
         for (Unit x = x1; x < x2; x++)
         {
             // Get max y
@@ -125,6 +130,7 @@ namespace paint
                 // TODO: y < y2 or y <= y2
                 for (Unit y = 0; y < y1; y++)
                 {
+                    // Use symetry to color the 4 pixels
                     std::copy_n(reinterpret_cast<uint8_t *>(fill_c->GetData()), fill_c->GetDataSize(), reinterpret_cast<uint8_t *>((*dp)[y * image_size.x + x]));
                     std::copy_n(reinterpret_cast<uint8_t *>(fill_c->GetData()), fill_c->GetDataSize(), reinterpret_cast<uint8_t *>((*dp)[y * image_size.x + (c_outer.center.x << 2) - x]));
                     std::copy_n(reinterpret_cast<uint8_t *>(fill_c->GetData()), fill_c->GetDataSize(), reinterpret_cast<uint8_t *>((*dp)[((c_outer.center.y << 2) - y) * image_size.x + x]));
@@ -132,10 +138,11 @@ namespace paint
                 }
             }
 
-            // Fill all pixels between c_inner & c_outer
+            // Fill the rest of pixels between c_inner & c_outer
             // TODO: y < y2 or y <= y2
             for (Unit y = y1; y < y2; y++)
             {
+                // Use symetry to color the 4 pixels
                 std::copy_n(reinterpret_cast<uint8_t *>(border_c->GetData()), border_c->GetDataSize(), reinterpret_cast<uint8_t *>((*dp)[y * image_size.x + x]));
                 std::copy_n(reinterpret_cast<uint8_t *>(border_c->GetData()), border_c->GetDataSize(), reinterpret_cast<uint8_t *>((*dp)[y * image_size.x + (c_outer.center.x << 2) - x]));
                 std::copy_n(reinterpret_cast<uint8_t *>(border_c->GetData()), border_c->GetDataSize(), reinterpret_cast<uint8_t *>((*dp)[((c_outer.center.y << 2) - y) * image_size.x + x]));
@@ -162,17 +169,20 @@ namespace paint
         if (p.x < 0 || p.x >= image_size.x || p.y < 0 || p.y >= image_size.y)
             return;
 
+        // Init 2 sets used for breadth search
         std::set<int> pixels_to_search;
         std::set<int> pixels_to_change;
         int first_idx = p.y * dp->image_size_.x + p.x;
         pixels_to_change.insert(first_idx);
 
+        // Init the color
         std::unique_ptr<Color> picked_color(dp->GetColorType());
         picked_color->SetFromData((*dp)[first_idx]);
         size_t color_size_bytes(picked_color->GetDataSize());
 
         void *fill_data_ptr = fill_color.value_or(next_command_color_)->GetData();
 
+        // Search pixels to replace
         while (!pixels_to_search.empty() || !pixels_to_change.empty())
         {
             // Iterate through all found pixels with the same color in previous iteration
@@ -252,12 +262,16 @@ namespace paint
         if (p2.y > image_size.y)
             p2.y = image_size.y;
 
+        // Set new data
         std::shared_ptr<DataPixels> new_data_pixels = std::make_shared<DataPixels>(Point{p2.x - p1.x, p2.y - p1.y}, dp->GetColorType());
-        auto it = new_data_pixels->begin();
-        auto it_end = new_data_pixels->end();
         Point new_size = new_data_pixels->image_size_;
         size_t color_size_bytes = dp->GetColorType()->GetDataSize();
 
+        // Set iterators
+        auto it = new_data_pixels->begin();
+        auto it_end = new_data_pixels->end();
+
+        // For each pixel in new data -> set data from old data
         int x = p1.x;
         int y = p1.y;
         for (; it != it_end; it++, x++)
@@ -295,6 +309,7 @@ namespace paint
 
         vec2f point_in_old;
 
+        // Create new data
         std::shared_ptr<DataPixels> new_data_pixels = std::make_shared<DataPixels>(Point{new_image_size.x, new_image_size.y}, dp->GetColorType());
 
         // Letf, right, top and bottom points used for bilinear interpolation
@@ -303,17 +318,21 @@ namespace paint
         Unit p_top;
         Unit p_bottom;
 
+        // Init colors for 4 points
         std::shared_ptr<Color> c1(dp->GetColorType().release());
         std::shared_ptr<Color> c2(dp->GetColorType().release());
         std::shared_ptr<Color> c_interp_bottom(dp->GetColorType().release());
         std::shared_ptr<Color> c_interp_top(dp->GetColorType().release());
 
+        // For each pixel in new data
         for (int y = 0; y != new_image_size.y; y++)
         {
             for (int x = 0; x != new_image_size.x; x++)
             {
+                // Get pixel position in old image
                 point_in_old = vec2f{x * multiplier.u, y * multiplier.v};
 
+                // Find surrounding pixels
                 p_left = std::floor(point_in_old.u);
                 p_right = std::ceil(point_in_old.u);
                 p_top = std::floor(point_in_old.v); // Top point is at (x, 0)!!!
@@ -358,7 +377,11 @@ namespace paint
 
         Point image_size = dp->image_size_;
         size_t color_size_bytes = dp->GetColorType()->GetDataSize();
+
+        // Create new data
         std::shared_ptr<DataPixels> new_data_pixels = std::make_shared<DataPixels>(Point{image_size.y, image_size.x}, dp->GetColorType());
+
+        // Create iterators to new data
         auto it = new_data_pixels->begin();
         auto it_end = new_data_pixels->end();
 
@@ -451,14 +474,15 @@ namespace paint
 
         Point image_size = dp->image_size_;
         std::shared_ptr<Color> old_color(dp->GetColorType());
-        //size_t old_color_size_bytes = old_color->GetDataSize();
 
+        // Create new data
         std::shared_ptr<DataPixels> new_data_pixels = std::make_shared<DataPixels>(Point{image_size.y, image_size.x}, dp->GetColorType());
         std::shared_ptr<Color> new_color;
         size_t new_color_size_bytes = new_color->GetDataSize();
 
         int pixel_count = image_size.x * image_size.y;
 
+        // Load each pixel from old data, convert to grayscale and save into new data
         for (int idx = 0; idx < pixel_count; idx++)
         {
             // Copy data from pixel to color
@@ -467,7 +491,8 @@ namespace paint
             std::copy_n(reinterpret_cast<uint8_t *>(new_color->GetData()), new_color_size_bytes, reinterpret_cast<uint8_t *>((*dp)[idx]));
         }
 
-        throw;
+        throw; // No grayscale color (new_color) whut are you doin?
+
         // Call back that image was edited
         image_edit_callback_();
     }

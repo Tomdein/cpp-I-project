@@ -73,12 +73,14 @@ namespace paint
         {
             command = std::make_shared<SaveCommand>(std::filesystem::path(match[1].str()));
         }
+
         // SAVE command
         // Do not check the file
         else if (std::regex_match(line, match, Parser::re_save_))
         {
             command = std::make_shared<SaveCommand>(std::filesystem::path(match[1].str()));
         }
+
         // COLOR command
         else if (std::regex_match(line, match, Parser::re_color_))
         {
@@ -93,6 +95,7 @@ namespace paint
 
             command = std::make_shared<ColorCommand>(std::shared_ptr<Color>(new ColorRGB888(r, g, b)));
         }
+
         // LINE command
         else if (std::regex_match(line, match, Parser::re_line_))
         {
@@ -113,21 +116,28 @@ namespace paint
             // Has optional parameters
             if (match[7].matched == true)
             {
+                // Parse optional parameters
                 std::vector<std::pair<std::string, std::string>> opt_args = Parser::ParseOptionalArgs(match[7].str());
 
                 bool has_color = false;
                 bool has_line_width = false;
+
+                // Read the optional parameters
                 for (auto &[arg, val] : opt_args)
                 {
+                    // Read color
                     if (arg == "color" && has_color == false)
                     {
                         has_color = true;
 
                         line_command->AddLineColor(std::make_shared<ColorRGB888>(std::move(ParseColorVal(val))));
                     }
+                    // Read width
                     else if (arg == "width" && has_line_width == false)
                     {
                         int width = std::stoi(val);
+
+                        // Width cannot be zero ( width is non negative because of regex )
                         if (width == 0)
                         {
                             throw parse_error(val);
@@ -138,6 +148,7 @@ namespace paint
                     }
                     else
                     {
+                        // Unknown optional parameter or duplicate parameter
                         throw parse_error(match[7].str());
                     }
                 }
@@ -145,6 +156,7 @@ namespace paint
 
             command = std::move(line_command);
         }
+
         // CIRCLE command
         else if (std::regex_match(line, match, Parser::re_circle_))
         {
@@ -173,8 +185,10 @@ namespace paint
                 bool has_border_color_arg = false;
                 bool has_border_width_arg = false;
 
+                // Read the optional parameters
                 for (auto &[arg, val] : opt_args)
                 {
+                    // Read fill parameter
                     if (arg == "fill" && !has_fill_arg)
                     {
                         has_fill_arg = true;
@@ -192,23 +206,35 @@ namespace paint
                             throw parse_error(arg + ": " + val);
                         }
                     }
+                    // Read fill-color parameter
                     else if (arg == "fill-color" && !has_fill_color_arg)
                     {
                         has_fill_color_arg = true;
                         circle_command->AddCircleFillColor(std::make_shared<ColorRGB888>(Parser::ParseColorVal(val)));
                     }
+                    // Read border-color parameter
                     else if (arg == "border-color" && !has_border_color_arg)
                     {
                         has_border_color_arg = true;
                         circle_command->AddCircleBorderColor(std::make_shared<ColorRGB888>(Parser::ParseColorVal(val)));
                     }
+                    // Read border-width parameter
                     else if (arg == "border-width" && !has_border_width_arg)
                     {
+                        int width = std::stoi(val);
+
+                        // Width cannot be zero ( width is non negative because of regex )
+                        if (width == 0)
+                        {
+                            throw parse_error(val);
+                        }
+
                         has_border_width_arg = true;
-                        circle_command->AddCircleBorderWidth(std::stoi(val));
+                        circle_command->AddCircleBorderWidth(width);
                     }
                     else
                     {
+                        // Unknown optional parameter or duplicate parameter
                         throw parse_error(arg + ": " + val);
                     }
                 }
@@ -216,6 +242,7 @@ namespace paint
 
             command = circle_command;
         }
+
         // BUCKET command
         else if (std::regex_match(line, match, Parser::re_bucket_))
         {
@@ -237,10 +264,12 @@ namespace paint
             {
                 std::vector<std::pair<std::string, std::string>> opt_args = Parser::ParseOptionalArgs(match[5].str());
 
+                // Read the optional parameters
                 for (auto &[arg, val] : opt_args)
                 {
                     bool has_color_arg = false;
 
+                    // Read color parameter
                     if (arg == "color" && !has_color_arg)
                     {
                         has_color_arg = true;
@@ -248,11 +277,13 @@ namespace paint
                     }
                     else
                     {
+                        // Unknown optional parameter or duplicate parameter
                         throw parse_error(arg + ": " + val);
                     }
                 }
             }
         }
+
         // RESIZE command
         else if (std::regex_match(line, match, Parser::re_resize_))
         {
@@ -270,6 +301,7 @@ namespace paint
             }
             command = std::move(resize_command);
         }
+
         // ROTATE command
         else if (std::regex_match(line, match, Parser::re_rotate_))
         {
@@ -284,16 +316,19 @@ namespace paint
                 rotate_command = std::make_shared<RotateCommand>(Rotation::kCounterClock);
             }
         }
+
         // INVERT_COLOR command
         else if (std::regex_match(line, match, Parser::re_invert_colors_))
         {
             command = std::make_shared<InvertColorCommand>();
         }
+
         // GRAYSCALE command
         else if (std::regex_match(line, match, Parser::re_grayscale_))
         {
             command = std::make_shared<GrayscaleCommand>();
         }
+
         // CROP command
         else if (std::regex_match(line, match, Parser::re_crop_))
         {
@@ -310,11 +345,13 @@ namespace paint
                                                         std::make_shared<PointPX>(std::stoi(match[4].str()), std::stoi(match[5].str())));
             }
         }
+
         // UNDO command
         else if (std::regex_match(line, match, Parser::re_undo_))
         {
             command = std::make_shared<UndoCommand>();
         }
+
         // REDO command
         else if (std::regex_match(line, match, Parser::re_redo_))
         {
@@ -322,6 +359,7 @@ namespace paint
         }
         else
         {
+            // No command matched -> throw error
             throw parse_error(line);
         }
 
@@ -333,12 +371,16 @@ namespace paint
         std::vector<std::pair<std::string, std::string>> parsed_args;
         std::smatch match;
 
+        // Set optional args iterators
         std::sregex_token_iterator it(opt_args.begin(), opt_args.end(), Parser::re_param_delim_, -1);
         std::sregex_token_iterator it_end = std::sregex_token_iterator();
 
         std::string s;
+
+        // Iterate optional args
         for (; it != it_end; it++)
         {
+            // Get optional arg
             s = it->str();
 
             // If failed to parse -> throw
@@ -351,6 +393,7 @@ namespace paint
             parsed_args.emplace_back(match[1].str(), match[2].str() + match[3].str());
         }
 
+        // Return mathches
         return parsed_args;
     }
 
@@ -365,15 +408,18 @@ namespace paint
             throw parse_error(color_arg);
         }
 
+        // Read the RGB888 color
         int r = std::stoi(color_match[1].str());
         int g = std::stoi(color_match[2].str());
         int b = std::stoi(color_match[3].str());
 
+        // Any component of color cannot be bigger than 255
         if (r > 255 || g > 255 || b > 255)
         {
             throw parse_error(color_arg);
         }
 
+        // Return parsed color
         return ColorRGB888(r, g, b);
     }
 }

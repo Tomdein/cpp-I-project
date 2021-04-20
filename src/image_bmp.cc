@@ -189,34 +189,46 @@ namespace paint
 
         void ImageBMP::CreateDataBuffer()
         {
+            // Check if dimensions in BMP header are valid
             if (header_bmp_info_.bi_width == 0 || header_bmp_info_.bi_height == 0)
                 throw "Unable to create image data. Image dimensions missing.";
 
+            // Get the dimensions from BMP header
             Point image_size{static_cast<int>(header_bmp_info_.bi_width), static_cast<int>(header_bmp_info_.bi_height)};
 
+            // Prepare color
             std::unique_ptr<Color> color;
+
             // TODO: Create more colors for BMP
+            // Select color based on BMP header
             switch (header_bmp_info_.bi_bitCount)
             {
+
             case k1bpPX:
                 throw "Black and white color not implemented yet.";
                 break;
+
             case k4bpPX:
                 throw "4bpPX color not implemented yet.";
                 break;
+
             case k8bpPX:
                 throw "8bpPX color not implemented yet.";
                 break;
+
+            // RGB888
             case k24bpPX:
                 color = std::make_unique<ColorRGB888>(0, 0, 0);
                 break;
             }
 
+            // Create new data
             image_data_ = std::make_shared<DataPixels>(image_size, std::move(color));
         }
 
         void ImageBMP::GenerateMetadata()
         {
+            // Generate headers from image data
             header_bmp_.bf_size = image_data_->GetSize().x * image_data_->GetSize().y * image_data_->GetColorType()->GetDataSize() + sizeof(HeaderBMP) + sizeof(HeaderBMPInfo);
             header_bmp_.bf_offBits = 0x36;
 
@@ -232,18 +244,21 @@ namespace paint
 
         void ImageBMP::SaveBuffer()
         {
-            int idx = 0;
+            // Create image_dump dir
             std::filesystem::create_directory("./image_dump");
 
+            int idx = 0;
+
+            // Go through every picture in undo history and save it
             for (auto &img : this->image_data_undo_history_)
             {
-                image_data_ = (img);
-
+                // Set file name and filepath
                 std::stringstream s;
                 s.str(std::string());
                 s << "./image_dump/img_" << idx << ".bmp";
                 file_out_ = File{FileType::kBMP, s.str()};
 
+                // Save the image
                 SaveImage();
 
                 idx++;
