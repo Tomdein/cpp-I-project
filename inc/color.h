@@ -36,6 +36,7 @@ namespace paint
         virtual void SetFromData(const void *data) = 0;
         virtual void *GetData() = 0;
         virtual size_t GetDataSize() const = 0;
+        virtual size_t GetDataSizeBits() const = 0;
     };
 }
 

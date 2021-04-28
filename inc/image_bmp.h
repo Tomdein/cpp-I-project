@@ -33,6 +33,7 @@ namespace paint
             k1bpPX = 1,   /// 1 bit per pixel
             k4bpPX = 4,   /// 4 bits per pixel
             k8bpPX = 8,   /// 8 bits per pixel
+            k16bpPX = 16, /// 16 bits per pixel
             k24bpPX = 24, /// 24 bits per pixel
         };
 
@@ -99,6 +100,7 @@ namespace paint
             ImageBMP(std::filesystem::path input_file_path)
             {
                 file_in_ = File{FileType::kBMP, input_file_path};
+                file_out_ = File{FileType::kBMP, input_file_path};
             }
             virtual ~ImageBMP() override {}
 
@@ -129,6 +131,7 @@ namespace paint
         private:
             HeaderBMP header_bmp_;          /// BMP header struct.
             HeaderBMPInfo header_bmp_info_; /// BMP info header struct.
+            friend class ImageIOBMP;
 
             /**
              * @brief Checks if \ref header_bmp is valid.

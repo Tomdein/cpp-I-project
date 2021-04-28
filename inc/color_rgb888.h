@@ -65,6 +65,7 @@ namespace paint
         };
         virtual void *GetData() override { return reinterpret_cast<void *>(&pixel_); };
         virtual size_t GetDataSize() const override { return sizeof(PixelRGB888); };
+        virtual size_t GetDataSizeBits() const override { return 24; };
 
     private:
         PixelRGB888 pixel_;

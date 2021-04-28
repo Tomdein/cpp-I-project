@@ -13,7 +13,7 @@
 namespace paint
 {
 
-    extern const PixelRGB888 bw_palette[2];
+    extern const PixelBGRA8888 bw_palette[2];
 
     class ColorBW : public Color
     {
@@ -65,10 +65,11 @@ namespace paint
         }
         virtual void *GetData() override { return reinterpret_cast<void *>(&pixel_); }
         virtual size_t GetDataSize() const override { return sizeof(PixelBW); }
+        virtual size_t GetDataSizeBits() const override { return 1; };
 
     private:
         PixelBW pixel_;
-        //const PixelRGB888 (&bw_palette_)[2] = bw_palette;
+        const PixelBGRA8888 (&bw_palette_)[2] = bw_palette;
     };
 }
 

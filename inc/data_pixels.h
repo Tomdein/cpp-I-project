@@ -117,7 +117,7 @@ namespace paint
             {
                 throw std::out_of_range("Accesssing data pixels out of range.");
             }
-            return &data_[x * image_size_.x + y];
+            return &data_[(y * image_size_.x + x) * pixel_struct_size_byte_];
         }
 
         /**

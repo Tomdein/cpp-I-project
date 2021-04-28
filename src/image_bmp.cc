@@ -1,7 +1,10 @@
-#include "image_bmp.h"
+//#include "image_bmp.h"
+#include "image_iobmp.h"
 #include "colors.h"
 
 #include <fstream>
+
+#include <iostream>
 
 namespace paint
 {
@@ -24,8 +27,8 @@ namespace paint
                 file.open(file_in_.file_path_, std::ios::binary);
 
                 // Read BMP headers
-                file.read(reinterpret_cast<char *>(&header_bmp_), sizeof(HeaderBMP));
-                file.read(reinterpret_cast<char *>(&header_bmp_info_), sizeof(HeaderBMPInfo));
+                ImageIOBMP::ReadHeaderBMP(file, *this);
+                ImageIOBMP::ReadHeaderBMPInfo(file, *this);
 
                 // Check if BMP headers are valid
                 if (!CheckHeader() | !CheckHeaderInfo())
@@ -33,43 +36,32 @@ namespace paint
                     throw "Invalid file format";
                 }
 
-                // Move to the start of the pixel data
-                file.seekg(header_bmp_.bf_offBits);
-
-                //TODO: Create DataPixels
-                // Calculate the size of pixel data to be loaded
-                size_t data_size;
-                if (header_bmp_info_.bi_sizeImage == 0)
-                {
-                    // Calculate the size in bytes (multiply by size of pixel in bits and divide by 8)
-                    data_size = std::ceil(header_bmp_info_.bi_width * header_bmp_info_.bi_height * header_bmp_info_.bi_bitCount / 8.0f);
-                }
-                else
-                {
-                    data_size = header_bmp_info_.bi_sizeImage;
-                }
-
-                // Create pixel data buffer and read pixel data
-                unprocessed_data = std::make_unique<uint8_t[]>(data_size);
-                file.read(reinterpret_cast<char *>(unprocessed_data.get()), data_size);
+                if (header_bmp_info_.bi_bitCount != BiBitCount::k24bpPX &&
+                    header_bmp_info_.bi_bitCount != BiBitCount::k16bpPX &&
+                    header_bmp_info_.bi_bitCount != BiBitCount::k8bpPX &&
+                    header_bmp_info_.bi_bitCount != BiBitCount::k1bpPX)
+                    throw "Only RGB888 & RGB565 & Grayscale & BW is implemented.";
 
                 // Create data structure for editing the pixels
                 CreateDataBuffer();
 
-                if (header_bmp_info_.bi_bitCount != k24bpPX)
-                    throw "Only RGB888 is implemented.";
+                // Move to the start of the pixel data
+                file.seekg(header_bmp_.bf_offBits);
 
-                std::copy_n(reinterpret_cast<uint8_t *>(unprocessed_data.get()), data_size, reinterpret_cast<uint8_t *>(*image_data_->begin()));
+                // Read the pixel data
+                ImageIOBMP::ReadPixelData(file, *this);
 
                 file.close();
 
+                // Attach data to the image painter
+                painter.AttachImageData(image_data_);
+
                 // The data has changed (new data loaded) -> copy the data to undo history
                 ImageEditCallback();
-
-                painter.AttachImageData(image_data_);
             }
             catch (const std::ios_base::failure &fail)
             {
+                throw fail;
             }
         }
 
@@ -88,53 +80,18 @@ namespace paint
                 // Open output file
                 file.open(file_out_.file_path_, std::ios::binary);
 
-                // Read BMP headers
-                file.write(reinterpret_cast<char *>(&header_bmp_), sizeof(HeaderBMP));
-                file.write(reinterpret_cast<char *>(&header_bmp_info_), sizeof(HeaderBMPInfo));
-
-                //TODO: Create DataPixels
-                // Calculate the size of pixel data to be loaded
-                size_t data_size;
-                if (header_bmp_info_.bi_sizeImage == 0)
-                {
-                    // Calculate the size in bytes (multiply by size of pixel in bits and divide by 8)
-                    data_size = std::ceil(header_bmp_info_.bi_width * header_bmp_info_.bi_height * header_bmp_info_.bi_bitCount / 8.0f);
-                }
-                else
-                {
-                    data_size = header_bmp_info_.bi_sizeImage;
-                }
-
-                // How many bits after 4byte alignment
-                int four_byte_align = header_bmp_info_.bi_bitCount * header_bmp_info_.bi_width % 32;
-                // How many remainning bits to 4byte alignment
-                if (four_byte_align != 0)
-                {
-                    four_byte_align = 32 - four_byte_align;
-
-                    // How many remainning bytes to 4byte alignment, discarding the first incomplete byte, which will be copied when copying by line
-                    four_byte_align = four_byte_align / 8;
-                }
-
-                int padding = 0;
-                for (size_t y = 0; y < header_bmp_info_.bi_height; y++)
-                {
-                    file.write(reinterpret_cast<char *>((*image_data_)[y * header_bmp_info_.bi_width]),
-                               std::ceil(header_bmp_info_.bi_width * static_cast<float>(header_bmp_info_.bi_bitCount) / 8));
-
-                    if (four_byte_align)
-                    {
-                        file.write(reinterpret_cast<char *>(&padding), four_byte_align);
-                    }
-                }
+                // Write BMP headers
+                ImageIOBMP::WriteHeaderBMP(file, *this);
+                ImageIOBMP::WriteHeaderBMPInfo(file, *this);
 
                 // Write pixel data
-                file.write(reinterpret_cast<char *>(*image_data_->begin()), data_size);
+                ImageIOBMP::WritePixelData(file, *this);
 
                 file.close();
             }
             catch (const std::ios_base::failure &fail)
             {
+                throw fail;
             }
         }
 
@@ -205,16 +162,23 @@ namespace paint
             switch (header_bmp_info_.bi_bitCount)
             {
 
+            // Black and white (or mapped color)
             case k1bpPX:
-                throw "Black and white color not implemented yet.";
+                color = std::make_unique<ColorBW>(0);
                 break;
 
             case k4bpPX:
                 throw "4bpPX color not implemented yet.";
                 break;
 
+            // Grayscale (or mapped color)
             case k8bpPX:
-                throw "8bpPX color not implemented yet.";
+                color = std::make_unique<ColorGrayscale>(0);
+                break;
+
+            // RGB565
+            case k16bpPX:
+                color = std::make_unique<ColorGrayscale>(0);
                 break;
 
             // RGB888
@@ -230,28 +194,31 @@ namespace paint
         void ImageBMP::GenerateMetadata()
         {
             // Generate headers from image data
-            header_bmp_.bf_size = image_data_->GetSize().x * image_data_->GetSize().y * image_data_->GetColorType()->GetDataSize() + sizeof(HeaderBMP) + sizeof(HeaderBMPInfo);
-            header_bmp_.bf_offBits = 0x36;
-
             header_bmp_info_.bi_size = 0x28;
             header_bmp_info_.bi_width = image_data_->GetSize().x;
             header_bmp_info_.bi_height = image_data_->GetSize().y;
-            header_bmp_info_.bi_bitCount = image_data_->GetColorType()->GetDataSize() * 8;
+            header_bmp_info_.bi_bitCount = image_data_->GetColorType()->GetDataSizeBits();
             header_bmp_info_.bi_compression = kBiRGB;
-            header_bmp_info_.bi_sizeImage = image_data_->GetSize().x * image_data_->GetSize().y * image_data_->GetColorType()->GetDataSize(); // Uncompressed size
+            header_bmp_info_.bi_sizeImage = (header_bmp_info_.bi_width * header_bmp_info_.bi_bitCount + 31) / 32 * header_bmp_info_.bi_height * 4; // Uncompressed size
             header_bmp_info_.bi_clrUsed = 0;
             header_bmp_info_.bi_clrImportant = 0;
+
+            header_bmp_.bf_size = header_bmp_info_.bi_sizeImage + sizeof(HeaderBMP) + sizeof(HeaderBMPInfo);
+            header_bmp_.bf_offBits = 0x36;
         }
 
         void ImageBMP::SaveBuffer()
         {
+
+            throw "TODO";
+
             // Create image_dump dir
             std::filesystem::create_directory("./image_dump");
 
             int idx = 0;
 
             // Go through every picture in undo history and save it
-            for (auto &img : this->image_data_undo_history_)
+            for ([[maybe_unused]] auto &img : this->image_data_undo_history_)
             {
                 // Set file name and filepath
                 std::stringstream s;

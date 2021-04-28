@@ -23,5 +23,5 @@ namespace paint
         return *this;
     }
 
-    const PixelRGB888 bw_palette[2] = {{0, 0, 0}, {255, 255, 255}};
+    const PixelBGRA8888 bw_palette[2] = {{0, 0, 0, 0}, {255, 255, 255, 0}};
 }

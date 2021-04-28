@@ -6,23 +6,25 @@
 namespace paint
 {
     /**
-     * @brief A structure for storing 2 bytes wide RGB color.
+     * @brief A structure for storing 4 bytes wide BGR color with alpha channel.
      * 
-     * This structure saves RGB color information in 2 bytes:
-     *  5 bits for red color
-     *  6 bits for green color
-     *  5 bits for blue color
+     * This structure saves BGR color information with alpha channel in 4 bytes:
+     *  8 bits for blue color
+     *  8 bits for green color
+     *  8 bits for red color
+     *  8 bits for alpha
      * 
      */
-    struct PixelRGB565
+    struct PixelBGRA8888
     {
-        uint16_t r : 5; /// Red color
-        uint16_t g : 6; /// Green color
-        uint16_t b : 5; /// Blue color
+        uint8_t b : 8; /// Blue color
+        uint8_t g : 8; /// Green color
+        uint8_t r : 8; /// Red color
+        uint8_t a : 8; /// Alpha color
 
-        bool operator==(const PixelRGB565 &other) const
+        bool operator==(const PixelBGRA8888 &other) const
         {
-            return r == other.r && g == other.g && b == other.b;
+            return r == other.r && g == other.g && b == other.b && a == other.a;
         }
     };
 
@@ -42,6 +44,27 @@ namespace paint
         uint8_t b : 8; /// Blue color
 
         bool operator==(const PixelRGB888 &other) const
+        {
+            return r == other.r && g == other.g && b == other.b;
+        }
+    };
+
+    /**
+     * @brief A structure for storing 2 bytes wide RGB color.
+     * 
+     * This structure saves RGB color information in 2 bytes:
+     *  5 bits for red color
+     *  6 bits for green color
+     *  5 bits for blue color
+     * 
+     */
+    struct PixelRGB565
+    {
+        uint16_t r : 5; /// Red color
+        uint16_t g : 6; /// Green color
+        uint16_t b : 5; /// Blue color
+
+        bool operator==(const PixelRGB565 &other) const
         {
             return r == other.r && g == other.g && b == other.b;
         }

@@ -2,6 +2,8 @@
 #include "unit.h"
 #include "vec.h"
 
+#include "colors.h"
+
 #include <set>
 #include <cstring>
 
@@ -338,22 +340,39 @@ namespace paint
                 p_top = std::floor(point_in_old.v); // Top point is at (x, 0)!!!
                 p_bottom = std::ceil(point_in_old.v);
 
-                // Start with bottom points. Set them to their color
-                c1->SetFromData((*dp)[p_bottom * image_size.x + p_left]);
-                c2->SetFromData((*dp)[p_bottom * image_size.x + p_right]);
+                if (p_left != p_right)
+                {
+                    // Start with bottom points. Set them to their color
+                    c1->SetFromData((*dp)[p_bottom * image_size.x + p_left]);
+                    c2->SetFromData((*dp)[p_bottom * image_size.x + p_right]);
 
-                // Interpolate bottom points
-                c_interp_bottom->Interpolate(c1, c2, point_in_old.u - p_left);
+                    // Interpolate bottom points
+                    c_interp_bottom->Interpolate(c1, c2, 1 - (point_in_old.u - p_left));
+                }
+                else
+                {
+                    c1->SetFromData((*dp)[p_bottom * image_size.x + p_left]);
+                    c_interp_bottom->SetColor(*c1);
+                }
 
-                // Then set top points to their color
-                c1->SetFromData((*dp)[p_top * image_size.x + p_left]);
-                c2->SetFromData((*dp)[p_top * image_size.x + p_right]);
+                if (p_top != p_bottom)
+                {
+                    // Then set top points to their color
+                    c1->SetFromData((*dp)[p_top * image_size.x + p_left]);
+                    c2->SetFromData((*dp)[p_top * image_size.x + p_right]);
 
-                // Interpolate top points
-                c_interp_top->Interpolate(c1, c2, point_in_old.u - p_left);
+                    // Interpolate top points
+                    c_interp_top->Interpolate(c1, c2, 1 - (point_in_old.u - p_left));
+                }
+                else
+                {
+                    c1->SetFromData((*dp)[p_top * image_size.x + p_left]);
+                    c_interp_top->SetColor(*c1);
+                }
 
                 // Now interpolate the c_interp_bottom & c_interp_top in y direction
-                c1->Interpolate(c_interp_top, c_interp_bottom, point_in_old.v - p_top);
+                c1->Interpolate(c_interp_top, c_interp_bottom, 1 - (point_in_old.v - p_top));
+                //c1->SetColor(ColorRGB888(0, 0, 0));
 
                 // Copy the color data
                 std::copy_n(reinterpret_cast<uint8_t *>(c1->GetData()), c1->GetDataSize(), reinterpret_cast<uint8_t *>((*new_data_pixels)[y * new_image_size.x + x]));

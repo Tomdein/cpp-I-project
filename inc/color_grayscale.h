@@ -13,7 +13,7 @@
 namespace paint
 {
 
-    extern const PixelRGB888 grayscale_palette[256];
+    extern const PixelBGRA8888 grayscale_palette[256];
 
     class ColorGrayscale : public Color
     {
@@ -65,10 +65,11 @@ namespace paint
         };
         virtual void *GetData() override { return reinterpret_cast<void *>(&pixel_); };
         virtual size_t GetDataSize() const override { return sizeof(PixelGrayscale); };
+        virtual size_t GetDataSizeBits() const override { return 8; };
 
     private:
         PixelGrayscale pixel_;
-        const PixelRGB888 (&grayscale_palette_)[256] = grayscale_palette;
+        const PixelBGRA8888 (&grayscale_palette_)[256] = grayscale_palette;
     };
 }
 
