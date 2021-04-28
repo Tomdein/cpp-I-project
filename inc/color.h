@@ -14,6 +14,7 @@ namespace paint
     class ColorRGB565;
     class ColorRGB888;
     class ColorGrayscale;
+    class ColorBW;
 
     class Color
     {
@@ -25,7 +26,8 @@ namespace paint
 
         virtual ColorRGB565 ToRGB565() const = 0;
         virtual ColorRGB888 ToRGB888() const = 0;
-        virtual ColorGrayscale ToGreyscale() const = 0;
+        virtual ColorGrayscale ToGrayscale() const = 0;
+        virtual ColorBW ToBW() const = 0;
 
         virtual void SetColor(const Color &other) = 0;
         virtual void InvertColor() = 0;

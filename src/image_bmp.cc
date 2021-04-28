@@ -75,6 +75,7 @@ namespace paint
 
         void ImageBMP::SaveImage()
         {
+            // Renew the headers
             GenerateMetadata();
 
             try

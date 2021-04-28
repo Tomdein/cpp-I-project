@@ -31,7 +31,8 @@ namespace paint
 
         virtual ColorRGB565 ToRGB565() const override;
         virtual ColorRGB888 ToRGB888() const override;
-        virtual ColorGrayscale ToGreyscale() const override;
+        virtual ColorGrayscale ToGrayscale() const override;
+        virtual ColorBW ToBW() const override;
 
         virtual void SetFromData(const void *data) override
         {

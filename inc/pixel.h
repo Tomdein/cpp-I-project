@@ -63,6 +63,23 @@ namespace paint
             return w == other.w;
         }
     };
+
+    /**
+     * @brief A structure for storing 1 byte wide black and white color.
+     * 
+     * This structure saves black and white color information in 1 byte:
+     *  1 bits for b & w color
+     * 
+     */
+    struct PixelBW
+    {
+        uint8_t w : 1; /// Grayscale color
+
+        bool operator==(const PixelBW &other) const
+        {
+            return w == other.w;
+        }
+    };
 }
 
 #endif // PAINT_INC_PIXEL_H_
