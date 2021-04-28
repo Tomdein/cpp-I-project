@@ -2,8 +2,6 @@
 #include "unit.h"
 #include "vec.h"
 
-#include "colors.h"
-
 #include <set>
 #include <cstring>
 
@@ -191,7 +189,6 @@ namespace paint
             std::for_each(pixels_to_change.begin(), pixels_to_change.end(), [&](auto &i) {
                 // Change the color of the pixel to fill_color
                 std::copy_n(reinterpret_cast<uint8_t *>(fill_data_ptr), color_size_bytes, reinterpret_cast<uint8_t *>((*dp)[i]));
-                image_edit_callback_(); // TESTING
             });
 
             // Clear pixels_to_search

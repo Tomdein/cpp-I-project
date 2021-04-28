@@ -52,8 +52,6 @@ namespace paint
                 image.header_bmp_info_.bi_bitCount == BiBitCount::k16bpPX ||
                 image.header_bmp_info_.bi_bitCount == BiBitCount::k8bpPX)
             {
-                //std::copy_n(reinterpret_cast<uint8_t *>(image.unprocessed_data.get()), data_size, reinterpret_cast<uint8_t *>(image.image_data_->at(0, 0)));
-
                 // For each row
                 for (size_t y = 0; y < image.header_bmp_info_.bi_height; y++)
                 {

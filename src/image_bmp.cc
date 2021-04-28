@@ -4,8 +4,6 @@
 
 #include <fstream>
 
-#include <iostream>
-
 namespace paint
 {
     namespace image_bmp
