@@ -158,7 +158,48 @@ namespace paint
             }
             else
             {
-                throw "TODO BMP BiBitCount::k1bpPX && BiBitCount::k4bpPX support";
+                char data_byte = 0;
+                // For each line
+                for (size_t y = 0; y < image.header_bmp_info_.bi_height; y++)
+                {
+                    // For each byte in line
+                    for (int x = 0; x < data_width_bytes; x++)
+                    {
+                        // Clear compressed data_byte
+                        data_byte = 0;
+
+                        for (size_t i = 0; i < 8 / image.header_bmp_info_.bi_bitCount; i++)
+                        {
+                            // Set bits in data_byte
+                            int idx = y * image.header_bmp_info_.bi_width + x * 8 + (8 / image.header_bmp_info_.bi_bitCount - i - 1);
+                            int shift = i * image.header_bmp_info_.bi_bitCount;
+                            unsigned char val;
+                            if (image.header_bmp_info_.bi_bitCount == BiBitCount::k1bpPX)
+                            {
+                                val = (*reinterpret_cast<const PixelBW *>((*image.image_data_)[idx])).w;
+                            }
+                            else
+                            {
+                                throw "todo BiBitCount::k4bpPX"; // not done
+                            }
+
+                            data_byte |= val << shift;
+
+                            // data_byte |= (*reinterpret_cast<const char *>((*image.image_data_)[y * image.header_bmp_info_.bi_width + x * 8 + i])) << (i * image.header_bmp_info_.bi_bitCount);
+                        }
+
+                        // Write the single compressed byte;
+                        file.write(&data_byte, 1);
+                    }
+
+                    // Add padding at the end of line
+                    if (four_byte_align)
+                    {
+                        file.write(reinterpret_cast<const char *>(&padding), four_byte_align);
+                    }
+                }
+
+                // throw "TODO BMP BiBitCount::k1bpPX && BiBitCount::k4bpPX support";
             }
         }
     }

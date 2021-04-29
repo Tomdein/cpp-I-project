@@ -1,5 +1,6 @@
 #include "painter.h"
 #include "color_grayscale.h"
+#include "color_bw.h"
 #include "unit.h"
 #include "vec.h"
 
@@ -513,6 +514,41 @@ namespace paint
         std::shared_ptr<DataPixels> dp = image_data_.lock();
 
         dp->TransformToColorType(std::unique_ptr<Color>(new ColorGrayscale(0)));
+
+        // Point image_size = dp->image_size_;
+        // std::shared_ptr<Color> old_color(dp->GetColorType());
+
+        // // Create new data
+        // std::shared_ptr<Color> new_color_grayscale(new ColorGrayscale(0));
+        // std::shared_ptr<DataPixels> new_data_pixels = std::make_shared<DataPixels>(Point{image_size.y, image_size.x}, dp->GetColorType());
+        // size_t new_color_size_bytes = new_color_grayscale->GetDataSize();
+
+        // int pixel_count = image_size.x * image_size.y;
+
+        // // Load each pixel from old data, convert to grayscale and save into new data
+        // for (int idx = 0; idx < pixel_count; idx++)
+        // {
+        //     // Copy data from pixel to color
+        //     old_color->SetFromData((*dp)[idx]);
+        //     new_color_grayscale->SetColor(*old_color);
+        //     std::copy_n(reinterpret_cast<uint8_t *>(new_color_grayscale->GetData()), new_color_size_bytes, reinterpret_cast<uint8_t *>((*dp)[idx]));
+        // }
+
+        // throw "image_data_.expired"; // No grayscale color (new_color) whut are you doin?
+
+        // Call back that image was edited
+        image_edit_callback_();
+    }
+
+    void Painter::ConvertToBW()
+    {
+        if (image_data_.expired())
+            throw "image_data_.expired";
+
+        // Lock the image data
+        std::shared_ptr<DataPixels> dp = image_data_.lock();
+
+        dp->TransformToColorType(std::unique_ptr<Color>(new ColorBW(0)));
 
         // Point image_size = dp->image_size_;
         // std::shared_ptr<Color> old_color(dp->GetColorType());

@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "image_bmp.h"
+#include "painter.h"
 #include "file.h"
 #include "colors.h"
 #include "point.h"
@@ -48,6 +49,11 @@ int main()
     image.LoadImage();
     image.SetOutputImage(paint::File{paint::FileType::kBMP, "../../images/out_grayscale.bmp"});
     image.painter.ConvertToGrayscale();
+    image.SaveImage();
+
+    image.LoadImage();
+    image.SetOutputImage(paint::File{paint::FileType::kBMP, "../../images/out_b&w.bmp"});
+    image.painter.ConvertToBW();
     image.SaveImage();
 
     image.LoadImage();

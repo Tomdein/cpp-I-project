@@ -126,14 +126,24 @@ namespace paint
          * @brief Inverts the color.
          *  
          * Changes every pixel color to its inverse.
+         * 
          */
+
         virtual void InvertColors();
         /**
          * @brief Converts the color to grayscale.
          * 
          * Converts every pixel to grayscale color.
+         * 
          */
         virtual void ConvertToGrayscale();
+        /**
+         * @brief Converts the color to black & white.
+         * 
+         * Converts every pixel to black & white color.
+         * 
+         */
+        virtual void ConvertToBW();
 
     private:
         std::shared_ptr<Color> next_command_color_; /// Global color used when no color is specified.
