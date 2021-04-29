@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "colors.h"
 
 namespace paint
@@ -14,7 +16,8 @@ namespace paint
 
     ColorGrayscale ColorRGB888::ToGrayscale() const
     {
-        return ColorGrayscale((pixel_.r + pixel_.g + pixel_.b) / 3);
+        //https://stackoverflow.com/questions/14330/rgb-to-monochrome-conversion
+        return ColorGrayscale(std::round(0.2125f * pixel_.r + 0.7154f * pixel_.g + 0.0721f * pixel_.b));
     }
 
     ColorBW ColorRGB888::ToBW() const

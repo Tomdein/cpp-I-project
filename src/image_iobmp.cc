@@ -158,6 +158,8 @@ namespace paint
             }
             else
             {
+                size_t colors_per_byte = 8 / image.header_bmp_info_.bi_bitCount;
+
                 char data_byte = 0;
                 // For each line
                 for (size_t y = 0; y < image.header_bmp_info_.bi_height; y++)
@@ -168,11 +170,11 @@ namespace paint
                         // Clear compressed data_byte
                         data_byte = 0;
 
-                        for (size_t i = 0; i < 8 / image.header_bmp_info_.bi_bitCount; i++)
+                        for (size_t i = 0; i < colors_per_byte; i++)
                         {
                             // Set bits in data_byte
-                            int idx = y * image.header_bmp_info_.bi_width + x * 8 + (8 / image.header_bmp_info_.bi_bitCount - i - 1);
-                            int shift = i * image.header_bmp_info_.bi_bitCount;
+                            int idx = y * image.header_bmp_info_.bi_width + x * 8 + i;
+                            int shift = (colors_per_byte - i - 1) * image.header_bmp_info_.bi_bitCount;
                             unsigned char val;
                             if (image.header_bmp_info_.bi_bitCount == BiBitCount::k1bpPX)
                             {
