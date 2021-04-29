@@ -18,7 +18,7 @@ namespace paint
                            const std::optional<Unit> &line_width_)
     {
         if (image_data_.expired())
-            throw;
+            throw "image_data_.expired";
 
         // Lock the image data
         std::shared_ptr<DataPixels> dp = image_data_.lock();
@@ -30,36 +30,59 @@ namespace paint
 
         // TODO reverse the vector if it is in direction of [-1,-1]. It would break the algorithm if THE loop
         //      or do some checks/swaps in the loop
-        // Calculate paameters of line equations
+        // Calculate parameters of line equations
         line t{static_cast<float>(l_start.y - l_end.y),
                static_cast<float>(l_end.x - l_start.x),
                static_cast<float>(l_start.x * l_end.y - l_start.y * l_end.x)};
 
         // Create 2 parallel lines with distance of 1/2 l_width
+        // Point (x, y + l_width_half)
         line t1(t);
-        t1.c += l_width_half;
+        t1.c -= t1.b * l_width_half;
 
+        // Point (x, y - l_width_half)
         line t2(t);
-        t1.c -= l_width_half;
+        t2.c += t2.b * l_width_half;
 
         vec2 size{dp->image_size_.x, dp->image_size_.y};
         vec2 y_bounds; // u is upper bound v is lower bound
-        for (float x = 0.5; x < size.u; x += 1)
-        {
-            y_bounds.u = std::round(line_get_y(t1, x) - 0.5f);
-            y_bounds.v = std::round(line_get_y(t2, x) - 0.5f);
 
-            // Check bounds
+        // Set start and end x coordinates
+        int x = l_start.x;
+        int x_end = l_end.x;
+
+        // Set x to be on the left
+        if (x > x_end)
+        {
+            std::swap(x, x_end);
+        }
+
+        // Check bounds of left (starting) x
+        if (x < 0)
+            x = 0;
+
+        // Check bounds of right (ending) x
+        if (x_end > size.u)
+            x_end = size.u;
+
+        // For each x fill calculated y points
+        for (; x < x_end; x += 1)
+        {
+            y_bounds.u = std::round(line_get_y(t1, x));
+            y_bounds.v = std::round(line_get_y(t2, x));
+
+            // Check bounds of max (top) y
             if (y_bounds.u > size.v)
                 y_bounds.u = size.v;
 
+            // Check bounds of min (bottom) y
             if (y_bounds.v < 0)
-                y_bounds.u = 0;
+                y_bounds.v = 0;
 
-            for (Unit y = y_bounds.v; y <= y_bounds.u; y++)
+            for (Unit y = y_bounds.v; y <= y_bounds.u && y < size.v; y++)
             {
                 // line n{-t.a, t.b, 0.0f}; // Check distance (line_intersection & norm)
-                std::copy_n(reinterpret_cast<uint8_t *>(l_color->GetData()), l_color->GetDataSize(), reinterpret_cast<uint8_t *>((*dp)[y * size.u + std::floor(x)]));
+                std::copy_n(reinterpret_cast<uint8_t *>(l_color->GetData()), l_color->GetDataSize(), reinterpret_cast<uint8_t *>((*dp)[y * size.u + x]));
             }
         }
 
@@ -75,7 +98,7 @@ namespace paint
                              const std::optional<Unit> &border_width)
     {
         if (image_data_.expired())
-            throw;
+            throw "image_data_.expired";
 
         // Lock the image data
         std::shared_ptr<DataPixels> dp = image_data_.lock();
@@ -156,7 +179,7 @@ namespace paint
     void Painter::DrawBucket(const BasePoint &point, const std::optional<std::shared_ptr<Color>> &fill_color)
     {
         if (image_data_.expired())
-            throw;
+            throw "image_data_.expired";
 
         // Lock the image data
         std::shared_ptr<DataPixels> dp = image_data_.lock();
@@ -205,12 +228,12 @@ namespace paint
 
                 // Check left pixel
                 idx -= 2;
-                if (idx > 0 && p % image_size.x != 0 && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
+                if (idx >= 0 && p % image_size.x != 0 && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
                     pixels_to_search.insert(idx);
 
                 // Check top pixel
                 idx = p - image_size.x;
-                if (idx > 0 && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
+                if (idx >= 0 && !std::memcmp((*dp)[idx], picked_color->GetData(), color_size_bytes))
                     pixels_to_search.insert(idx);
 
                 // Check top pixel
@@ -231,7 +254,7 @@ namespace paint
     void Painter::Crop(const BasePoint &corner1, const BasePoint &corner2)
     {
         if (image_data_.expired())
-            throw;
+            throw "image_data_.expired";
 
         // Lock the image data
         std::shared_ptr<DataPixels> dp = image_data_.lock();
@@ -247,7 +270,7 @@ namespace paint
 
         // Both points are out of the bound -> error (|| because p1 should be the left top point and p2 should be bottom right point)
         if ((p1.x > image_size.x && p1.y > image_size.y) || (p2.x < 0 && p2.y < 0))
-            throw;
+            throw "image_data_.expired";
 
         // If p1 is to the left or above the image -> move to the edge
         if (p1.x < 0)
@@ -296,7 +319,7 @@ namespace paint
     void Painter::Resize(const BasePoint &new_size)
     {
         if (image_data_.expired())
-            throw;
+            throw "image_data_.expired";
 
         // Lock the image data
         std::shared_ptr<DataPixels> dp = image_data_.lock();
@@ -386,7 +409,7 @@ namespace paint
     void Painter::Rotate(Rotation rotation)
     {
         if (image_data_.expired())
-            throw;
+            throw "image_data_.expired";
 
         // Lock the image data
         std::shared_ptr<DataPixels> dp = image_data_.lock();
@@ -458,7 +481,7 @@ namespace paint
     void Painter::InvertColors()
     {
         if (image_data_.expired())
-            throw;
+            throw "image_data_.expired";
 
         // Lock the image data
         std::shared_ptr<DataPixels> dp = image_data_.lock();
@@ -483,7 +506,7 @@ namespace paint
     void Painter::ConvertToGrayscale()
     {
         if (image_data_.expired())
-            throw;
+            throw "image_data_.expired";
 
         // Lock the image data
         std::shared_ptr<DataPixels> dp = image_data_.lock();
@@ -507,7 +530,7 @@ namespace paint
             std::copy_n(reinterpret_cast<uint8_t *>(new_color->GetData()), new_color_size_bytes, reinterpret_cast<uint8_t *>((*dp)[idx]));
         }
 
-        throw; // No grayscale color (new_color) whut are you doin?
+        throw "image_data_.expired"; // No grayscale color (new_color) whut are you doin?
 
         // Call back that image was edited
         image_edit_callback_();

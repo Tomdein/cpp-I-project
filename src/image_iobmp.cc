@@ -1,5 +1,7 @@
 #include "image_iobmp.h"
 
+#include <iostream>
+
 namespace paint
 {
     namespace image_bmp
@@ -18,7 +20,6 @@ namespace paint
 
         void ImageIOBMP::ReadPixelData(std::ifstream &file, ImageBMP &image)
         {
-
             // Calculate the size of pixel data to be loaded
             size_t data_size = image.header_bmp_info_.bi_sizeImage;
             if (data_size == 0)

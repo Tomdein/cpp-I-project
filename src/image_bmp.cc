@@ -3,6 +3,7 @@
 #include "colors.h"
 
 #include <fstream>
+#include <iostream>
 
 namespace paint
 {
@@ -59,6 +60,7 @@ namespace paint
             }
             catch (const std::ios_base::failure &fail)
             {
+                std::cout << "Error reading from file: " << file_in_.file_path_.string() << std::endl;
                 throw fail;
             }
         }
@@ -89,6 +91,7 @@ namespace paint
             }
             catch (const std::ios_base::failure &fail)
             {
+                std::cout << "Error writing to file: " << file_out_.file_path_.string() << std::endl;
                 throw fail;
             }
         }

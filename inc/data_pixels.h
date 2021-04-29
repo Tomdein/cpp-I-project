@@ -101,7 +101,10 @@ namespace paint
          * @param pos the position of pixels (represented as linear array of pixels).
          * @return void* pointer to the pixel at \ref pos.
          */
-        void *operator[](size_t pos) { return &data_[pos * pixel_struct_size_byte_]; }
+        void *operator[](size_t pos)
+        {
+            return &data_[pos * pixel_struct_size_byte_];
+        }
         /**
          * @brief A random access method with position as coordinates.
          * 

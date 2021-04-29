@@ -35,9 +35,9 @@ namespace paint
      */
     struct line
     {
-        float a;
-        float b;
-        float c;
+        float a; /// a * x
+        float b; /// b * y
+        float c; /// A constant
     };
 
     inline vec2f line_intersection(const line &l1, const line &l2)
@@ -46,6 +46,7 @@ namespace paint
 
         if (l1.a == l2.a && l1.b == l2.b)
         {
+            throw "TODO: rework condition";
             vec.u = -1;
             vec.v = -1;
             return vec;
