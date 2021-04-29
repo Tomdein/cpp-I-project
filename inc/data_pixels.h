@@ -55,7 +55,7 @@ namespace paint
         {
             size_t byte_count = pixel_count_ * pixel_struct_size_byte_;
             data_ = std::unique_ptr<uint8_t[]>(new uint8_t[byte_count]);
-            mempcpy(data_.get(), other.data_.get(), byte_count);
+            std::copy_n(reinterpret_cast<uint8_t *>(other.data_.get()), byte_count, reinterpret_cast<uint8_t *>(data_.get()));
         }
 
         ~DataPixels(){};
@@ -172,16 +172,16 @@ namespace paint
          */
         void TransformToColorType(const std::unique_ptr<Color> &new_color)
         {
+            size_t new_pixel_size = new_color->GetDataSize();
 
             // Allocate space for pixel data
-            std::unique_ptr<uint8_t[]> new_data(new uint8_t[pixel_count_]);
+            std::unique_ptr<uint8_t[]> new_data(new uint8_t[pixel_count_ * new_pixel_size]);
 
             // Create iterators to old pixel data
             iterator it_old = begin();
             iterator it_old_end = end();
 
             // Create iterator to new pixel data
-            size_t new_pixel_size = new_color->GetDataSize();
             iterator it_new(new_data.get(), new_pixel_size);
 
             // Saves the pointer to the color data that will change inside for loop
@@ -193,8 +193,11 @@ namespace paint
             // For each pixel: load the color, tranform the color and then save the color
             for (; it_old != it_old_end; it_old++, it_new++)
             {
+                // Copy from data_ to old_color
                 std::copy_n(reinterpret_cast<uint8_t *>(*it_old), pixel_struct_size_byte_, reinterpret_cast<uint8_t *>(old_color_data_ptr));
+                // Set grayscale_color from old_color
                 new_color->SetColor(*data_color_);
+                // Copy grayscale_color data to new_data
                 std::copy_n(reinterpret_cast<uint8_t *>(new_color_data_ptr), new_pixel_size, reinterpret_cast<uint8_t *>(*it_new));
             }
 

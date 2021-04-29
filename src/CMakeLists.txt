@@ -34,9 +34,10 @@
 
 #set(PaintSources ${painter} ${parser} ${paint} ${image} ${image_png} ${image_bmp} ${color_grayscale} ${color_rgb888} ${color_bw} ${color_rgb565} PARENT_SCOPE)
 
-add_executable(Empty_Main ./empty_main.cc)
+add_executable(Empty_Main ./empty_main.cc ${PaintSources})
 add_executable(Paint ./main.cc  ${PaintSources})
 add_executable(App ./app.cc ${PaintSources})
 
+target_include_directories(Empty_Main PUBLIC "${Paint_SOURCE_DIR}/inc")
 target_include_directories(Paint PUBLIC "${Paint_SOURCE_DIR}/inc")
 target_include_directories(App PUBLIC "${Paint_SOURCE_DIR}/inc")

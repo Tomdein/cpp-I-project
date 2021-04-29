@@ -1,6 +1,7 @@
 #include "image_iobmp.h"
 
-#include <iostream>
+#include "color_grayscale.h"
+#include "color_bw.h"
 
 namespace paint
 {
@@ -104,8 +105,25 @@ namespace paint
             file.write(reinterpret_cast<char *>(&image.header_bmp_info_), sizeof(HeaderBMPInfo));
         }
 
+        void ImageIOBMP::WriteColorTable(std::ofstream &file, ImageBMP &image)
+        {
+            switch (image.header_bmp_info_.bi_bitCount)
+            {
+            case BiBitCount::k1bpPX:
+                file.write(reinterpret_cast<const char *>(paint::bw_palette), sizeof(bw_palette));
+                break;
+
+            case BiBitCount::k8bpPX:
+                file.write(reinterpret_cast<const char *>(paint::grayscale_palette), sizeof(grayscale_palette));
+                break;
+            }
+        }
+
         void ImageIOBMP::WritePixelData(std::ofstream &file, ImageBMP &image)
         {
+            // Write the color table
+            WriteColorTable(file, image);
+
             // How many bits after 4byte alignment
             int four_byte_align = (image.header_bmp_info_.bi_bitCount * image.header_bmp_info_.bi_width) % 32;
             // How many remainning bits to 4byte alignment
@@ -122,14 +140,25 @@ namespace paint
 
             // Just bunch of 0's used for padding the row
             const int padding = 0;
-            for (size_t y = 0; y < image.header_bmp_info_.bi_height; y++)
-            {
-                file.write(reinterpret_cast<char *>((*image.image_data_)[y * image.header_bmp_info_.bi_width]), data_width_bytes);
 
-                if (four_byte_align)
+            // If pixel is multiple of byte
+            if (image.header_bmp_info_.bi_bitCount == BiBitCount::k24bpPX ||
+                image.header_bmp_info_.bi_bitCount == BiBitCount::k16bpPX ||
+                image.header_bmp_info_.bi_bitCount == BiBitCount::k8bpPX)
+            {
+                for (size_t y = 0; y < image.header_bmp_info_.bi_height; y++)
                 {
-                    file.write(reinterpret_cast<const char *>(&padding), four_byte_align);
+                    file.write(reinterpret_cast<char *>((*image.image_data_)[y * image.header_bmp_info_.bi_width]), data_width_bytes);
+
+                    if (four_byte_align)
+                    {
+                        file.write(reinterpret_cast<const char *>(&padding), four_byte_align);
+                    }
                 }
+            }
+            else
+            {
+                throw "TODO BMP BiBitCount::k1bpPX && BiBitCount::k4bpPX support";
             }
         }
     }

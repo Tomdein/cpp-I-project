@@ -204,8 +204,20 @@ namespace paint
             header_bmp_info_.bi_clrUsed = 0;
             header_bmp_info_.bi_clrImportant = 0;
 
-            header_bmp_.bf_size = header_bmp_info_.bi_sizeImage + sizeof(HeaderBMP) + sizeof(HeaderBMPInfo);
-            header_bmp_.bf_offBits = 0x36;
+            size_t color_map_size = 0;
+
+            switch (header_bmp_info_.bi_bitCount)
+            {
+            case BiBitCount::k1bpPX:
+                color_map_size = sizeof(paint::bw_palette);
+                break;
+            case BiBitCount::k8bpPX:
+                color_map_size = sizeof(paint::grayscale_palette);
+                break;
+            }
+
+            header_bmp_.bf_size = header_bmp_info_.bi_sizeImage + sizeof(HeaderBMP) + sizeof(HeaderBMPInfo) + color_map_size;
+            header_bmp_.bf_offBits = 0x36 + color_map_size;
         }
 
         void ImageBMP::SaveBuffer()

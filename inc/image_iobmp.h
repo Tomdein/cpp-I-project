@@ -24,6 +24,7 @@ namespace paint
 
             static void WriteHeaderBMP(std::ofstream &file, ImageBMP &image);
             static void WriteHeaderBMPInfo(std::ofstream &file, ImageBMP &image);
+            static void WriteColorTable(std::ofstream &file, ImageBMP &image);
             static void WritePixelData(std::ofstream &file, ImageBMP &image);
 
         private:
