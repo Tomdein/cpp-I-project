@@ -32,6 +32,14 @@ namespace paint
     protected:
         Parser parser_;                                  /// A parser for parsing commands.
         std::vector<std::shared_ptr<Command>> commands_; /// A list of commands.
+
+        /**
+         * @brief Checks whether input file with commands is valid.
+         * 
+         * Checks whether input file with commands is a *.txt file and that the given file exists.
+         * 
+         */
+        void CheckCommandFile(std::filesystem::path &commands_file_path_);
     };
 
     /**

@@ -57,6 +57,12 @@ int main()
     image.SaveImage();
 
     image.LoadImage();
+    image.SetOutputImage(paint::File{paint::FileType::kBMP, "../../images/out_b&w_removed_bg.bmp"});
+    image.painter.DrawBucket(paint::PointPX(0, 1), std::optional<std::shared_ptr<paint::Color>>(new paint::ColorRGB888(0, 0, 0)));
+    image.painter.ConvertToBW();
+    image.SaveImage();
+
+    image.LoadImage();
     image.SetOutputImage(paint::File{paint::FileType::kBMP, "../../images/out.bmp"});
     image.painter.Crop(paint::PointPX(3, 6), paint::PointPX(63, 42));
     image.painter.Rotate(paint::Rotation::kClock);
