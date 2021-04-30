@@ -2,8 +2,10 @@
 #define PAINT_INC_IMAGE_PNG_H_
 
 #include <cstdint>
+#include <vector>
 
 #include "image.h"
+#include "image_png_chunk.h"
 
 namespace paint
 {
@@ -15,17 +17,6 @@ namespace paint
          * 
          */
         const uint64_t kPNGSignature = 0x0a1a0a0d474e5089ULL;
-
-        struct ChunkIHDR
-        {
-            uint32_t width;
-            uint32_t height;
-            uint8_t bit_depth;
-            uint8_t color_type;
-            uint8_t compresison_method;
-            uint8_t filter_method;
-            uint8_t interlace_method;
-        };
 
         class ImagePNG : public Image
         {
@@ -39,7 +30,10 @@ namespace paint
             virtual void GenerateMetadata() override {}
 
         private:
-            ChunkIHDR chunk_ihdr_;
+            std::shared_ptr<ChunkIHDR> chunk_ihdr_;
+            std::shared_ptr<ChunkPLTE> chunk_ihdr_;
+            std::vector<std::shared_ptr<ChunkIDAT>> chunk_ihdr_;
+            std::shared_ptr<ChunkIEND> chunk_iend_;
         };
     }
 }
