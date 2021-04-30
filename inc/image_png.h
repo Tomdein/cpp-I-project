@@ -14,7 +14,7 @@ namespace paint
          * @brief Signature of the file signifying it is a PNG picture.
          * 
          */
-        const uint64_t kPNGSignature = 0x89504e470d0a1a0aULL;
+        const uint64_t kPNGSignature = 0x0a1a0a0d474e5089ULL;
 
         struct ChunkIHDR
         {
