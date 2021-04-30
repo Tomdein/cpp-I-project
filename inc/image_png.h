@@ -31,8 +31,8 @@ namespace paint
 
         private:
             std::shared_ptr<ChunkIHDR> chunk_ihdr_;
-            std::shared_ptr<ChunkPLTE> chunk_ihdr_;
-            std::vector<std::shared_ptr<ChunkIDAT>> chunk_ihdr_;
+            std::shared_ptr<ChunkPLTE> chunk_plte_;
+            std::vector<std::shared_ptr<ChunkIDAT>> vec_chunk_data_;
             std::shared_ptr<ChunkIEND> chunk_iend_;
         };
     }
