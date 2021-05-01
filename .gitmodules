@@ -7,3 +7,6 @@
 [submodule "CRCpp"]
 	path = CRCpp
 	url = https://github.com/d-bahr/CRCpp.git
+[submodule "build/src/zlib"]
+	path = build/src/zlib
+	url = https://github.com/madler/zlib.git
