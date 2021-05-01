@@ -6,12 +6,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
 
 
-message("generator is set to ${CMAKE_GENERATOR}")
+message("\nGenerator is set to ${CMAKE_GENERATOR}\n")
 
 add_compile_options(-Wall -Wextra -pedantic)
 
 include(CTest)
 enable_testing()
+
+find_path(ZLIB_HEADERS NAMES zlib.h PATHS zlib NO_DEFAULT_PATH)
+message("ZLIB header files: " ${ZLIB_HEADERS})
+
+find_library(ZLIB_LIBRARY NAMES z PATHS zlib/build NO_DEFAULT_PATH)
+message("ZLIB shared library: " ${ZLIB_LIBRARY})
+
+find_path(CRCpp_HEADER NAMES CRC.h PATHS CRCpp/inc NO_DEFAULT_PATH)
+message("CRC++ header files: " ${CRCpp_HEADER} "\n")
+
+# link_directories(zlib/build)
+link_directories(googletest/googletest/build/lib)
 
 get_filename_component(painter ./src/painter.cc ABSOLUTE)
 list(APPEND PaintSources ${painter})
@@ -34,6 +46,9 @@ list(APPEND PaintSources ${image_bmp})
 get_filename_component(image_iobmp ./src/image_iobmp.cc ABSOLUTE)
 list(APPEND PaintSources ${image_iobmp})
 
+get_filename_component(image_iopng ./src/image_iopng.cc ABSOLUTE)
+list(APPEND PaintSources ${image_iopng})
+
 get_filename_component(color_rgb888 ./src/color_rgb888.cc ABSOLUTE)
 list(APPEND PaintSources ${color_rgb888})
 
@@ -46,11 +61,16 @@ list(APPEND PaintSources ${color_grayscale})
 get_filename_component(color_bw ./src/color_bw.cc ABSOLUTE)
 list(APPEND PaintSources ${color_bw})
 
-message(${PaintSources})
+message("Source files: ")
+foreach(src_file IN LISTS PaintSources)
+    message("\t" ${src_file})
+endforeach()
+message("\n")
+# message("Source files: " "${PaintSources}" "\n")
+
 
 add_subdirectory(src)
 add_subdirectory(tests)
-add_subdirectory(googletest) 
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

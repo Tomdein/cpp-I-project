@@ -33,10 +33,6 @@ namespace paint
             uint8_t filter_method;
             uint8_t interlace_method;
         };
-
-        struct ChunkPLTEData
-        {
-        };
 #pragma pack()
 
         class ChunkPNG

@@ -34,6 +34,8 @@ namespace paint
             std::shared_ptr<ChunkPLTE> chunk_plte_;
             std::vector<std::shared_ptr<ChunkIDAT>> vec_chunk_data_;
             std::shared_ptr<ChunkIEND> chunk_iend_;
+
+            friend class ImageIOBMP;
         };
     }
 }
