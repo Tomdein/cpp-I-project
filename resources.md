@@ -9,6 +9,7 @@
 
 ## BMP doc:
 - [BMP file format](https://en.wikipedia.org/wiki/BMP_file_format)
+
 ---
 # Used libraries
 
@@ -20,3 +21,8 @@
 
 ## CRC++:
 - [CRC++ GitHub](https://github.com/d-bahr/CRCpp)
+
+---
+# Commands
+git ls-files | xargs wc -l
+git remote set-url --push origin no_push (disable push)
