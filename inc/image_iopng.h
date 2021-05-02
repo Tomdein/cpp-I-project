@@ -9,6 +9,8 @@ namespace paint
 {
     namespace image_png
     {
+        class ChunkPNG;
+
         /**
          * @brief This class contains methods to read and write PNG images.
          * 
@@ -18,9 +20,9 @@ namespace paint
         class ImageIOPNG
         {
         public:
-            static void ReadChunkPNG(std::ifstream &file, ImagePNG &image);
+            static std::shared_ptr<ChunkPNG> ReadChunkPNG(std::ifstream &file);
 
-            static void WriteChunkPNG(std::ofstream &file, ImagePNG &image);
+            static void WriteChunkPNG(std::ofstream &file, std::shared_ptr<ChunkPNG> &chunk);
 
         private:
             ImageIOPNG() {}

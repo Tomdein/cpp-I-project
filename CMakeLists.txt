@@ -16,7 +16,7 @@ enable_testing()
 find_path(ZLIB_HEADERS NAMES zlib.h PATHS zlib NO_DEFAULT_PATH)
 message("ZLIB header files: " ${ZLIB_HEADERS})
 
-find_library(ZLIB_LIBRARY NAMES z PATHS zlib/build NO_DEFAULT_PATH)
+find_library(ZLIB_LIBRARY NAMES z PATHS zlib NO_DEFAULT_PATH)
 message("ZLIB shared library: " ${ZLIB_LIBRARY})
 
 find_path(CRCpp_HEADER NAMES CRC.h PATHS CRCpp/inc NO_DEFAULT_PATH)
@@ -24,6 +24,8 @@ message("CRC++ header files: " ${CRCpp_HEADER} "\n")
 
 # link_directories(zlib/build)
 link_directories(googletest/googletest/build/lib)
+
+include_directories("${Paint_SOURCE_DIR}/inc" ${CRCpp_HEADER} ${ZLIB_HEADERS})
 
 get_filename_component(painter ./src/painter.cc ABSOLUTE)
 list(APPEND PaintSources ${painter})
@@ -37,17 +39,20 @@ list(APPEND PaintSources ${paint})
 get_filename_component(image ./src/image.cc ABSOLUTE)
 list(APPEND PaintSources ${image})
 
-get_filename_component(image_png ./src/image_png.cc ABSOLUTE)
-list(APPEND PaintSources ${image_png})
-
 get_filename_component(image_bmp ./src/image_bmp.cc ABSOLUTE)
 list(APPEND PaintSources ${image_bmp})
 
 get_filename_component(image_iobmp ./src/image_iobmp.cc ABSOLUTE)
 list(APPEND PaintSources ${image_iobmp})
 
+get_filename_component(image_png ./src/image_png.cc ABSOLUTE)
+list(APPEND PaintSources ${image_png})
+
 get_filename_component(image_iopng ./src/image_iopng.cc ABSOLUTE)
 list(APPEND PaintSources ${image_iopng})
+
+get_filename_component(image_png_chunk ./src/image_png_chunk.cc ABSOLUTE)
+list(APPEND PaintSources ${image_png_chunk})
 
 get_filename_component(color_rgb888 ./src/color_rgb888.cc ABSOLUTE)
 list(APPEND PaintSources ${color_rgb888})

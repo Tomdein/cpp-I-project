@@ -1,7 +1,5 @@
 # Use main.cpp to call and debug your code
 
-include_directories("${Paint_SOURCE_DIR}/inc" ${CRCpp_HEADER} ${ZLIB_HEADERS})
-
 add_executable(Empty_Main ./empty_main.cc ${PaintSources})
 # target_include_directories(Empty_Main PUBLIC "${Paint_SOURCE_DIR}/inc" ${CRCpp_HEADER})
 target_link_libraries(Empty_Main PUBLIC ${ZLIB_LIBRARY})
