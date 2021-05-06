@@ -1,0 +1,118 @@
+Paint:
+    BMP Support:
+        ✔ Loading @done(21-05-06 17:31)
+        ✔ Saving @done(21-05-06 17:31)
+        
+        Multiple color formats:
+            1bpPX:
+                ✔ Black and white @done(21-05-06 17:38)
+                ☐ Any color (color table)
+            4bpPX:
+                ☐ Any color (color table)
+            8bpPX:
+                ✔ Grayscale @done(21-05-06 17:39)
+                ☐ Any color (color table)
+            16bpPX:
+                ✔ RGB565 @done(21-05-06 17:40)
+                ☐ Any color (color table)
+            24bpPX:
+                ✔ RGB888 @done(21-05-06 17:40)
+                ☐ Any color (color table)
+            32bpPX:
+                ☐ Any color (color table)
+
+            ☐ Custom color table
+            ☐ Custom color mask
+
+        ☐ Compression support:
+            ✔ BiRGB (none) @done(21-05-06 17:35)
+            ☐ BiRLE4 (4-bit bitmap)
+            ☐ BiRLE8 (8-bit bitmap)
+            ☐ BiBitfields (bit field masks)
+            ☐ BiJPED
+            ☐ BiPNG
+
+    PNG Support:
+        Loading image:
+            ✔ Read chunks @done(21-05-06 17:41)
+            ✔ Check checksum (CRC32) @done(21-05-06 17:41)
+            Little endian <--> Big endian:
+                ✔ Length field @done(21-05-06 17:42)
+                ✔ Type field (DO NOT CHANGE. IT IS A STRING) @done(21-05-06 17:43)
+                Data field:
+                    ✔ IHDR @done(21-05-06 18:25)
+                    ☐ PLTE
+                    ☐ IDAT
+                    ✔ IEND @done(21-05-06 18:26)
+                    ☐ Others
+                ✔ CRC @done(21-05-06 17:46)
+            ☐ INFLATE pixel data @started(21-05-06 18:34)
+            Reading pixel data (from PNG datastream):
+                ☐ No interlace
+                ☐ Adam7
+
+        Saving image:
+            Save pixel data (to PNG datastream):
+                ☐ No interlace
+                ☐ Adam7
+            ☐ DEFLATE pixel data
+            ReGenerate metadata:
+                ☐ IHDR
+                ☐ PLTE
+                ☐ IDAT
+                ☐ IEND
+            Little endian <--> Big endian(See loading image)
+            ✔ Generate checksum (CRC32) @done(21-05-06 17:52)
+            ☐ Write chunks
+
+    Parsing:
+        ✔ Load @done(21-05-06 18:05)
+        ✔ Save @done(21-05-06 18:05)
+        ✔ Color @done(21-05-06 18:05)
+        ✔ Circle @done(21-05-06 18:05)
+        ✔ Bucket @done(21-05-06 18:05)
+        ✔ Resize @done(21-05-06 18:05)
+        ✔ Rotate @done(21-05-06 18:05)
+        ✔ Invert colors @done(21-05-06 18:05)
+        ✔ Grayscale @done(21-05-06 18:05)
+        ✔ Crop @done(21-05-06 18:05)
+        ✔ Udo @done(21-05-06 18:05)
+        ✔ Redo @done(21-05-06 18:05)
+    Tested parsing:
+        ✔ Line @done(21-05-06 18:05)
+
+    Pixel data:
+        ✔ Data structure for any pixels @done(21-05-06 18:11)
+        ✔ Color info @done(21-05-06 18:11)
+        ☐ Top-down/Bottom-up pixel line support? (BMP vs PNG)
+
+    Image:
+        ✔ Include data pixels @done(21-05-06 18:13)
+        ✔ Include painter @done(21-05-06 18:13)
+        Pixel data buffer:
+            ✔ Undo buffer @done(21-05-06 18:13)
+            ✔ Redo buffer @done(21-05-06 18:13)
+            ✔ Callback for saving @done(21-05-06 18:13)
+
+    Painter:
+        ✔ Atatach/Detach image @done(21-05-06 18:08)
+        ✔ Set color @done(21-05-06 18:08)
+        ☐ Circle
+        ✔ Line @done(21-05-06 18:10)
+        ✔ Bucket @done(21-05-06 18:10)
+        ✔ Crop @done(21-05-06 18:10)
+        ✔ Resize @done(21-05-06 18:10)
+        ✔ Rotate @done(21-05-06 18:10)
+        ✔ Invert colors @done(21-05-06 18:10)
+        ✔ To grayscale @done(21-05-06 18:10)
+        ✔ To black & white @done(21-05-06 18:10)
+
+
+
+
+    Applications:
+        CLI:
+        Batch:            
+        File:
+            
+            
