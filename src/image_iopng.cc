@@ -73,7 +73,7 @@ namespace paint
             return chunk;
         }
 
-        void ImageIOPNG::WriteChunkPNG(std::ofstream &file, std::shared_ptr<ChunkPNG> &chunk)
+        void ImageIOPNG::WriteChunkPNG(std::ofstream &file, std::shared_ptr<ChunkPNG> chunk)
         {
             // CLONE the chunk AND transform to big endian -> data does not get edited int the original chunk
             if (chunk->IsLittleEndian())

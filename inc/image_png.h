@@ -13,10 +13,34 @@ namespace paint
     {
 
         /**
-         * @brief Signature of the file signifying it is a PNG picture.
-         * 
-         */
-        const uint64_t kPNGSignature = 0x0a1a0a0d474e5089ULL;
+        * @brief A exception class
+        * 
+        * \ref error_bad_chunk is thrown when given data cannot be reinterpreted as a chunk or the data is invalid
+        * 
+        */
+        class error_bad_chunk : public std::exception
+        {
+        public:
+            error_bad_chunk() = default;
+            virtual ~error_bad_chunk() override {}
+
+            virtual const char *what() const noexcept override { return "Given chunk data is invalid"; }
+        };
+
+        /**
+        * @brief A exception class
+        * 
+        * \ref error_bad_chunk is thrown when given data cannot be reinterpreted as a chunk or the data is invalid
+        * 
+        */
+        class error_chunk_mismatch : public std::exception
+        {
+        public:
+            error_chunk_mismatch() = default;
+            virtual ~error_chunk_mismatch() override {}
+
+            virtual const char *what() const noexcept override { return "PNG chunks in given file has invalid chunk ordering"; }
+        };
 
         class ImagePNG : public Image
         {
@@ -25,15 +49,19 @@ namespace paint
             virtual ~ImagePNG() override {}
 
             virtual void CreateImage() override {}
-            virtual void LoadImage() override {}
-            virtual void SaveImage() override {}
+            virtual void LoadImage() override;
+            virtual void SaveImage() override;
             virtual void GenerateMetadata() override {}
 
         private:
-            std::shared_ptr<ChunkIHDR> chunk_ihdr_;
-            std::shared_ptr<ChunkPLTE> chunk_plte_;
-            std::vector<std::shared_ptr<ChunkIDAT>> vec_chunk_data_;
-            std::shared_ptr<ChunkIEND> chunk_iend_;
+            std::shared_ptr<ChunkIHDR> chunk_ihdr_;                  /// IHDR chunk (shall be first).
+            std::shared_ptr<ChunkPLTE> chunk_plte_;                  /// PLTE chunk (before first IDAT chunk).
+            std::vector<std::shared_ptr<ChunkIDAT>> vec_chunk_data_; /// Vector of IDATA chunks (shall be consecutive, each IDAT chunk contains pixel data).
+            std::shared_ptr<ChunkIEND> chunk_iend_;                  /// IDEN chunk (shall be last).
+
+            std::vector<std::shared_ptr<ChunkPNG>> vec_chunk_pre_plte_; /// Chunks that must be before PLTE and IDAT chunks.
+            std::vector<std::shared_ptr<ChunkPNG>> vec_chunk_pre_idat_; /// Chunks that must be before IDAT chunk.
+            std::vector<std::shared_ptr<ChunkPNG>> vec_chunk_pre_none;  /// Chunks that can be anywhere.
 
             friend class ImageIOBMP;
         };

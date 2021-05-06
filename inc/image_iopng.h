@@ -22,7 +22,7 @@ namespace paint
         public:
             static std::shared_ptr<ChunkPNG> ReadChunkPNG(std::ifstream &file);
 
-            static void WriteChunkPNG(std::ofstream &file, std::shared_ptr<ChunkPNG> &chunk);
+            static void WriteChunkPNG(std::ofstream &file, std::shared_ptr<ChunkPNG> chunk);
 
         private:
             ImageIOPNG() {}

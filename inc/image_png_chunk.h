@@ -2,17 +2,27 @@
 #define PAINT_INC_IMAGE_PNG_CHUNK_H_
 
 #include <cstdint>
-#include <memory>
+#include <fstream>
+#include <iostream>
 #include <algorithm>
+#include <memory>
 #include <cassert>
 
 #define CRCPP_USE_CPP11
 #include "CRC.h"
 
+#include "zlib.h"
+
 namespace paint
 {
     namespace image_png
     {
+        /**
+         * @brief Signature of the file signifying it is a PNG picture.
+         * 
+         */
+        const uint64_t kPNGSignature = 0x0a1a0a0d474e5089ULL;
+
         extern const CRC::Table<std::uint32_t, 32> crc32_table;
 
         enum ChunkType : uint32_t
@@ -84,6 +94,12 @@ namespace paint
 
             bool IsLittleEndian() const { return little_endian_; }
 
+            bool SafeToCopy()
+            {
+                uint32_t type = (IsLittleEndian()) ? type_ : __builtin_bswap32(type_);
+                return type & (0b00010000 << 24); // 5th bit of 4th byte is the 'Safe-to-copy bit' (5.4 Chunk naming conventions in 'PNG spec 2.0')
+            }
+
             virtual void ToLittleEndian()
             {
                 if (!little_endian_)
@@ -111,7 +127,7 @@ namespace paint
 
                 crc_ = CRC::Calculate(&type_, sizeof(type_), crc32_table);
                 crc_ = CRC::Calculate(&data_, length_, crc32_table, crc_);
-            };
+            }
 
         protected:
             uint32_t length_;                       /// The length of the PNG chunk (only the size of data_, not type_ or crc_).
@@ -153,8 +169,7 @@ namespace paint
                 if (!little_endian_)
                 {
                     ChunkPNG::ToLittleEndian();
-
-                    // TODO transform IHDRData to little endian
+                    SwapIHDRDataEndianity();
                 }
             }
 
@@ -163,12 +178,30 @@ namespace paint
                 if (little_endian_)
                 {
                     ChunkPNG::ToBigEndian();
-
-                    // TODO transform IHDRData to big endian
+                    SwapIHDRDataEndianity();
                 }
             }
 
             std::weak_ptr<ChunkIHDRData> GetIHDRData() { return std::reinterpret_pointer_cast<ChunkIHDRData>(data_); }
+
+        private:
+            void SwapIHDRDataEndianity()
+            {
+                // Get data
+                auto wptr_data = GetIHDRData();
+                auto sptr_data = wptr_data.lock();
+
+                // No data in shared_ptr
+                if (!sptr_data)
+                {
+                    std::cerr << "Cannot convert ChunkIHDR endianity - Data missing.";
+                    throw "Cannot convert ChunkIHDR endianity - Data missing.";
+                }
+
+                // Swap endianity
+                sptr_data->width = __builtin_bswap32(sptr_data->width);
+                sptr_data->height = __builtin_bswap32(sptr_data->height);
+            }
         };
 
         class ChunkPLTE : public ChunkPNG
@@ -221,8 +254,8 @@ namespace paint
         class ChunkIDAT : public ChunkPNG
         {
         public:
-            ChunkIDAT(uint32_t length, const std::shared_ptr<uint8_t[]> &data, uint32_t crc, bool little_endian = false)
-                : ChunkPNG(length, 0x54414449U, data, crc, little_endian) {}
+            ChunkIDAT(uint32_t length, const std::shared_ptr<uint8_t[]> &data, uint32_t crc, bool little_endian = false, bool deflated = true)
+                : ChunkPNG(length, 0x54414449U, data, crc, little_endian), deflated_(deflated) {}
 
             virtual std::shared_ptr<ChunkPNG> clone() const override
             {
@@ -263,6 +296,47 @@ namespace paint
                     // TODO transform IHDRData to big endian
                 }
             }
+
+            /**
+             * @brief Set the size of single pixel. 
+             * 
+             * Sets the size of one pixel in bytes -> used when changing endianity.
+             * Set from bit depth in IHDR chunk.
+             * 
+             * Only private variable.
+             * 
+             * @param size of pixel in bytes.
+             */
+            void SetPixelSizeBytes(size_t size) { pixel_size_bytes_ = size; }
+
+            /**
+             * @brief Return wether data is compressed (deflated) or not.
+             * 
+             * Used to find if data is compressed using Inflate/Deflate algorithm.
+             * 
+             * @return true if data is deflated (decompressed).
+             * @return false if data is inflated (compressed).
+             */
+            bool IsDeflated() { return deflated_; }
+            /**
+             * @brief Deflate the data.
+             * 
+             * Deflate (compress) the data.
+             * 
+             */
+            void Deflate()
+            {
+            }
+            /**
+             * @brief Inflate the data.
+             * 
+             * Inflate (decompress) the data.
+             */
+            void Inflate() {}
+
+        private:
+            size_t pixel_size_bytes_ = 1; /// Size of pixel in bytes.
+            bool deflated_ = true;        /// Data is deflated (compressed).
         };
 
         class ChunkIEND : public ChunkPNG
@@ -290,6 +364,22 @@ namespace paint
 
             ChunkIEND(const ChunkIEND &other) = delete;
             ChunkIEND &operator=(const ChunkIEND &other) = delete;
+
+            virtual void ToLittleEndian() override
+            {
+                if (!little_endian_)
+                {
+                    ChunkPNG::ToLittleEndian();
+                }
+            }
+
+            virtual void ToBigEndian() override
+            {
+                if (little_endian_)
+                {
+                    ChunkPNG::ToBigEndian();
+                }
+            }
         };
     }
 }

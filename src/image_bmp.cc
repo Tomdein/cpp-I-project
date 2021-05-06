@@ -15,13 +15,13 @@ namespace paint
 
         void ImageBMP::LoadImage()
         {
+            std::ifstream file;
+
+            // Set file to throw exceptions
+            file.exceptions(std::ios_base::failbit | std::ios_base::badbit | std::ios_base::eofbit);
+
             try
             {
-                std::ifstream file;
-
-                // Set file to throw exceptions
-                file.exceptions(std::ios_base::failbit | std::ios_base::badbit | std::ios_base::eofbit);
-
                 // Open input file
                 file.open(file_in_.file_path_, std::ios::binary);
 
@@ -60,7 +60,7 @@ namespace paint
             }
             catch (const std::ios_base::failure &fail)
             {
-                std::cout << "Error reading from file: " << file_in_.file_path_.string() << std::endl;
+                std::cout << "Error loading BMP image from file: " << file_in_.file_path_.string() << std::endl;
                 throw fail;
             }
         }
