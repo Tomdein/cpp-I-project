@@ -40,6 +40,12 @@ namespace paint
     class DataPixels
     {
     public:
+        /**
+         * @brief Construct a new Data Pixels object.
+         * 
+         * @param image_size struct of {width, height}.
+         * @param color_type color type.
+         */
         DataPixels(Point image_size, std::unique_ptr<Color> &&color_type) : pixel_struct_size_byte_(color_type->GetDataSize()),
                                                                             image_size_(image_size),
                                                                             pixel_count_(image_size.x * image_size.y),
@@ -48,6 +54,13 @@ namespace paint
         {
         }
 
+        /**
+         * @brief Construct a new Data Pixels object.
+         * 
+         * Construct a new DataPixels object while duplicationg all the data. 
+         * 
+         * @param other other DataPixels to copy from.
+         */
         DataPixels(const DataPixels &other) : pixel_struct_size_byte_(other.data_color_->GetDataSize()),
                                               image_size_(other.image_size_),
                                               pixel_count_(other.pixel_count_),
@@ -60,9 +73,10 @@ namespace paint
 
         ~DataPixels(){};
 
-        // The data in iterator is not dereferencable. It is just a 'void *'
         /**
          * @brief A DataPixels iterator.
+         * 
+         * The data in iterator is not dereferencable. It is just a 'void *'.
          * 
          */
         class iterator

@@ -74,7 +74,7 @@ namespace paint
         std::deque<std::shared_ptr<DataPixels>> image_data_redo_history_; /// Stores the previously undone images.
         std::unique_ptr<uint8_t[]> unprocessed_data;                      /// Storage for data before saving/loading pixel data from/to file.
 
-        // TODO: get rid of has_fixed_size_ & has_image_
+        //TODO: get rid of has_fixed_size_ & has_image_
         bool has_fixed_size_ = false;
         bool has_image_ = false;
 

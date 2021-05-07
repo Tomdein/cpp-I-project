@@ -20,12 +20,18 @@ namespace paint
         class ImageIOPNG
         {
         public:
+            static void ReadPNGFile(std::ifstream &file, ImagePNG &img);
             static std::shared_ptr<ChunkPNG> ReadChunkPNG(std::ifstream &file);
+            static void ReadIDATChunks(ImagePNG &img);
 
             static void WriteChunkPNG(std::ofstream &file, std::shared_ptr<ChunkPNG> chunk);
+            static void GenerateIHDRChunks(ImagePNG &img);
+            static void GenerateIDATChunks(ImagePNG &img);
 
         private:
-            ImageIOPNG() {}
+            ImageIOPNG(){};
+
+            static unsigned int ValuesInScanline(const std::unique_ptr<int[]> &scanline, int bytes);
         };
     }
 }

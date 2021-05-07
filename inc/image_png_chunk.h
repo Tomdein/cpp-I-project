@@ -35,11 +35,11 @@ namespace paint
 
         enum ColorType : uint8_t
         {
-            Grayscale = 0,
-            Truecolour = 2,
-            Indexed_colour = 3,
-            GrayscaleWithAlpha = 4,
-            TruecolourWithAlpha = 6
+            kGrayscale = 0,
+            kTruecolour = 2,
+            kIndexed_colour = 3,
+            kGrayscaleWithAlpha = 4,
+            kTruecolourWithAlpha = 6
         };
 
 #pragma pack(1)
@@ -141,6 +141,9 @@ namespace paint
         class ChunkIHDR : public ChunkPNG
         {
         public:
+            ChunkIHDR(const std::shared_ptr<ChunkIHDRData> &data, uint32_t crc, bool little_endian = false)
+                : ChunkPNG(sizeof(ChunkIHDRData), 0x52444849U, std::reinterpret_pointer_cast<uint8_t[]>(data), crc, little_endian) {}
+
             ChunkIHDR(uint32_t length, const std::shared_ptr<uint8_t[]> &data, uint32_t crc, bool little_endian = false)
                 : ChunkPNG(length, 0x52444849U, data, crc, little_endian) {}
 
@@ -323,16 +326,65 @@ namespace paint
              * 
              * Deflate (compress) the data.
              * 
+             * @param zstream used for deflating.
              */
-            void Deflate()
+            void Deflate(z_stream &zstream, const std::unique_ptr<uint8_t[]> data_to_deflate)
             {
+                // Data already compressed
+                if (deflated_)
+                    return;
+
+                int error;
+
+                zstream.avail_out = (little_endian_) ? length_ : __builtin_bswap32(length_);
+                zstream.next_out = data_to_deflate.get();
+                do
+                {
+                    // Should never run out of space
+                    assert(zstream.avail_out);
+
+                    error = deflate(&zstream, Z_NO_FLUSH);
+                    if (error != Z_OK && error != Z_STREAM_END)
+                    {
+                        std::cerr << "Error while deflating IDAT chunk!" << std::endl;
+                        throw "Error while deflating IDAT chunk";
+                    }
+                } while (error != Z_STREAM_END);
+
+                deflated_ = true;
             }
             /**
              * @brief Inflate the data.
              * 
              * Inflate (decompress) the data.
+             * 
+             * @param zstream used for inflating.
              */
-            void Inflate() {}
+            void Inflate(z_stream &zstream)
+            {
+                // Data already decompressed
+                if (!deflated_)
+                    return;
+
+                int error;
+                zstream.avail_in = (little_endian_) ? length_ : __builtin_bswap32(length_);
+                zstream.next_in = data_.get();
+                do
+                {
+                    // Should never run out of space
+                    assert(zstream.avail_out);
+
+                    error = inflate(&zstream, Z_NO_FLUSH);
+                    if (error != Z_OK && error != Z_STREAM_END)
+                    {
+
+                        std::cerr << "Error while inflating IDAT chunk!" << std::endl;
+                        throw "Error while inflating IDAT chunk";
+                    }
+                } while (error != Z_STREAM_END);
+
+                deflated_ = false;
+            }
 
         private:
             size_t pixel_size_bytes_ = 1; /// Size of pixel in bytes.

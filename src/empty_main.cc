@@ -27,7 +27,7 @@ int main(int, char *[])
     paint::image_png::ChunkIHDRData ihdr{__builtin_bswap32(0x48),
                                          __builtin_bswap32(0x30),
                                          0x8U,
-                                         paint::image_png::ColorType::Truecolour,
+                                         paint::image_png::ColorType::kTruecolour,
                                          0x0U,
                                          0x0U,
                                          0x0U};

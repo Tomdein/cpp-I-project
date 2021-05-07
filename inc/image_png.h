@@ -51,7 +51,7 @@ namespace paint
             virtual void CreateImage() override {}
             virtual void LoadImage() override;
             virtual void SaveImage() override;
-            virtual void GenerateMetadata() override {}
+            virtual void GenerateMetadata() override;
 
         private:
             std::shared_ptr<ChunkIHDR> chunk_ihdr_;                  /// IHDR chunk (shall be first).
@@ -63,7 +63,11 @@ namespace paint
             std::vector<std::shared_ptr<ChunkPNG>> vec_chunk_pre_idat_; /// Chunks that must be before IDAT chunk.
             std::vector<std::shared_ptr<ChunkPNG>> vec_chunk_pre_none;  /// Chunks that can be anywhere.
 
-            friend class ImageIOBMP;
+            friend class ImageIOPNG;
+
+            void WriteIDATChunks();
+
+            bool image_loaded_ = false;
         };
     }
 }

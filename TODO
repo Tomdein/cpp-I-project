@@ -46,7 +46,8 @@ Paint:
                     ✔ IEND @done(21-05-06 18:26)
                     ☐ Others
                 ✔ CRC @done(21-05-06 17:46)
-            ☐ INFLATE pixel data @started(21-05-06 18:34)
+            ✔ (Un)Filter data @done(21-05-07 16:03)
+            ✔ INFLATE pixel data @started(21-05-06 18:34) @done(21-05-07 21:39) @lasted(1d3h5m30s)
             Reading pixel data (from PNG datastream):
                 ☐ No interlace
                 ☐ Adam7
@@ -55,7 +56,9 @@ Paint:
             Save pixel data (to PNG datastream):
                 ☐ No interlace
                 ☐ Adam7
-            ☐ DEFLATE pixel data
+            
+            ✔ Filter data @started(21-05-07 21:39) @done(21-05-08 01:19) @lasted(3h40m23s)
+            ✔ DEFLATE pixel data @done(21-05-08 01:19)
             ReGenerate metadata:
                 ☐ IHDR
                 ☐ PLTE
@@ -64,6 +67,13 @@ Paint:
             Little endian <--> Big endian(See loading image)
             ✔ Generate checksum (CRC32) @done(21-05-06 17:52)
             ☐ Write chunks
+
+        Filter method:
+            ☐ Type 0 - None
+            ☐ Type 1 - Sub
+            ☐ Type 2 - Up
+            ☐ Type 3 - Average
+            ☐ Type 4 - Paeth
 
     Parsing:
         ✔ Load @done(21-05-06 18:05)
