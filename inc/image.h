@@ -48,9 +48,10 @@ namespace paint
          */
         void Redo();
 
-        virtual void CreateImage() = 0;
+        virtual void CreateImage(Point res, const std::unique_ptr<Color> &color) = 0;
         virtual void LoadImage() = 0;
         virtual void SaveImage() = 0;
+        virtual void SaveImage(const std::filesystem::path &path) = 0;
 
         /**
          * @brief Sets the output image path
@@ -77,6 +78,8 @@ namespace paint
         // TODO: get rid of has_fixed_size_ & has_image_
         bool has_fixed_size_ = false;
         bool has_image_ = false;
+
+        bool undo_was_last_command_ = false;
 
         /**
          * @brief Constant that sets thge size of the image history buffers.

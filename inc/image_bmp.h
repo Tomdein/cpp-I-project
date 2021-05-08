@@ -5,6 +5,7 @@
 #include <filesystem>
 
 #include "image.h"
+#include "file.h"
 
 namespace paint
 {
@@ -107,8 +108,10 @@ namespace paint
             /**
              * @brief Create an empty BMP image.
              * 
+             * @param res new and final resolution of image.
+             * @param color color type of the new image.
              */
-            virtual void CreateImage() override;
+            virtual void CreateImage(Point res, const std::unique_ptr<Color> &color) override;
 
             /**
              * @brief Load a BMP image from file.
@@ -121,6 +124,19 @@ namespace paint
              * 
              */
             virtual void SaveImage() override;
+
+            /**
+             * @brief Save the data into a BMP image.
+             * 
+             * Works like SaveImage(), but has overload for output file.
+             * 
+             * @param path to the file where to save the image.
+             */
+            virtual void SaveImage(const std::filesystem::path &path) override
+            {
+                file_out_ = File{FileType::kBMP, path};
+                SaveImage();
+            }
 
             /**
              * @brief Saves all images from history.

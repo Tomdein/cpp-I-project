@@ -46,7 +46,7 @@ Paint:
                     ✔ IEND @done(21-05-06 18:26)
                     ☐ Others
                 ✔ CRC @done(21-05-06 17:46)
-            ☐ INFLATE pixel data @started(21-05-06 18:34)
+            ✔ INFLATE pixel data @done(21-05-09 00:44)
             Reading pixel data (from PNG datastream):
                 ☐ No interlace
                 ☐ Adam7
@@ -76,10 +76,25 @@ Paint:
         ✔ Invert colors @done(21-05-06 18:05)
         ✔ Grayscale @done(21-05-06 18:05)
         ✔ Crop @done(21-05-06 18:05)
-        ✔ Udo @done(21-05-06 18:05)
+        ✔ Undo @done(21-05-06 18:05)
         ✔ Redo @done(21-05-06 18:05)
     Tested parsing:
         ✔ Line @done(21-05-06 18:05)
+
+    Commands:
+        ☐ Load
+        ☐ Save
+        ☐ Color
+        ☐ Circle
+        ☐ Bucket
+        ☐ Resize
+        ☐ Rotate
+        ☐ Invert colors
+        ☐ Grayscale
+        ☐ Crop
+        ☐ Undo
+        ☐ Redo
+        ☐ Line
 
     Pixel data:
         ✔ Data structure for any pixels @done(21-05-06 18:11)

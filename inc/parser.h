@@ -55,7 +55,7 @@ namespace paint
             kParseErrorSubstringLength = 256, /// Maximum length of the substring.
         };
 
-        char error_substring_[kParseErrorSubstringLength]; /// Array storing error command text
+        char error_substring_[kParseErrorSubstringLength]; /// Array storing error command text.
     };
 
     /**

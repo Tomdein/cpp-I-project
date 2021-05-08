@@ -8,6 +8,7 @@
 #include "unit.h"
 #include "point.h"
 #include "color.h"
+#include "color_rgb888.h"
 #include "rotation.h"
 #include "data_pixels.h"
 
@@ -26,7 +27,11 @@ namespace paint
     class Painter
     {
     public:
-        Painter(std::function<void()> image_edit_callback) : image_edit_callback_{std::move(image_edit_callback)} {}
+        Painter(std::function<void()> image_edit_callback) : image_edit_callback_{std::move(image_edit_callback)}
+        {
+            // Set default color to black
+            next_command_color_ = std::make_shared<ColorRGB888>(0, 0, 0);
+        }
 
         /**
          * @brief Connects Painter with image data.
@@ -53,7 +58,7 @@ namespace paint
          * 
          * @param color new global color.
          */
-        void SetNextColor(std::shared_ptr<Color> &color);
+        void SetNextColor(const std::shared_ptr<Color> &color);
 
         /**
          * @brief Draws a line from start to end.

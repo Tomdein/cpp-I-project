@@ -3,14 +3,55 @@
 
 #include <vector>
 #include <memory>
+#include <vector>
 #include <filesystem>
 
 #include "point.h"
 #include "command.h"
 #include "parser.h"
+#include "image.h"
+#include "image_png.h"
+#include "image_bmp.h"
 
 namespace paint
 {
+    class unknown_file_error : public std::exception
+    {
+    public:
+        unknown_file_error(const char *error_filename);
+
+        unknown_file_error(const std::string &error_filename);
+
+        virtual ~unknown_file_error() override{};
+
+        /**
+         * @brief Return what caused the exception.
+         * 
+         * @return const char* message describing what caused the exception.
+         */
+        virtual const char *what() const noexcept override;
+
+        /**
+         * @brief Get the filename that caused the exception.
+         * 
+         * 
+         * @return const char* cstring containing the filename that caused the error.
+         */
+        virtual const char *error_file() const noexcept;
+
+    private:
+        /**
+         * @brief A constant that define the maximum length of the filename.
+         * 
+         */
+        enum
+        {
+            kFilenameErrorLength = 256, /// Maximum length of the filename.
+        };
+
+        char error_filename_[kFilenameErrorLength]; /// Array storing error filename.
+    };
+
     /**
      * @brief Paint application interface.
      * 
@@ -40,6 +81,25 @@ namespace paint
          * 
          */
         void CheckCommandFile(std::filesystem::path &commands_file_path_);
+
+        std::unique_ptr<Image> CreateImageByExtension(const std::filesystem::path &file_path)
+        {
+            auto extension = file_path.extension();
+
+            if (extension == ".png")
+            {
+                return std::make_unique<image_png::ImagePNG>();
+            }
+            else if (extension == ".bmp")
+            {
+                return std::make_unique<image_bmp::ImageBMP>(file_path);
+            }
+            else
+            {
+                std::cerr << "Unsupported file/image type!" << std::endl;
+                throw unknown_file_error(file_path.string());
+            }
+        }
     };
 
     /**
@@ -67,6 +127,9 @@ namespace paint
          * 
          */
         virtual void Run() override;
+
+    private:
+        std::unique_ptr<Image> image_;
     };
 
     /**
@@ -90,6 +153,7 @@ namespace paint
 
     private:
         std::filesystem::path commands_file_path_;
+        std::vector<std::unique_ptr<Image>> images_;
     };
 
     /**
@@ -115,6 +179,8 @@ namespace paint
         virtual void Run() override;
 
     private:
+        std::unique_ptr<Image> image_; /// Image to draw onto.
+
         std::filesystem::path commands_file_path_; /// Filepath of a file with commands.
         paint::Point output_resolution_;           /// Output resolution of the image.
         std::filesystem::path output_file_path_;   /// Filepath of the output image.

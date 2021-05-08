@@ -9,6 +9,10 @@ include_directories(${PARENT_PATH_OF_GTEST}/googltest/googltest/include)
 add_executable(parser_test "./parser_test.cc" ${PaintSources})
 add_executable(parser_line_command "./parser_line_test.cc" ${PaintSources})
 add_executable(color_test "./color_test.cc" ${PaintSources})
+
+# Does not use GTest, only shows capabilities.
+add_executable(Drawing_Test ./drawing_test.cc  ${PaintSources})
+
 include_directories("${Paint_SOURCE_DIR}/inc")
 
 # set_target_properties(parse_test color_test PROPERTIES EXCLUDE_FROM_ALL 1)

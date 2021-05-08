@@ -27,15 +27,42 @@ namespace paint
         std::string command_name_;
     };
 
+    class LoadCommand : public Command
+    {
+    public:
+        explicit LoadCommand(std::filesystem::path path_to_file) : Command("LoadCommand"), path_to_file_(path_to_file){};
+        virtual ~LoadCommand(){};
+
+        virtual void Invoke([[maybe_unused]] Image &im) override
+        {
+            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
+        };
+
+        std::filesystem::path FilePath() const
+        {
+            return path_to_file_;
+        }
+
+    private:
+        std::filesystem::path path_to_file_;
+    };
+
     class SaveCommand : public Command
     {
     public:
         explicit SaveCommand(std::filesystem::path path_to_file) : Command("SaveCommand"), path_to_file_(path_to_file){};
         virtual ~SaveCommand(){};
 
-        virtual void Invoke([[maybe_unused]] Image &im) override
+        virtual void Invoke(Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
+            if (path_to_file_.empty())
+            {
+                im.SaveImage();
+            }
+            else
+            {
+                im.SaveImage(path_to_file_);
+            }
         };
 
     private:
@@ -50,7 +77,6 @@ namespace paint
 
         virtual void Invoke(Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
             im.painter.SetNextColor(color_);
         };
 
@@ -68,7 +94,6 @@ namespace paint
 
         virtual void Invoke(Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
             im.painter.DrawLine(*start_point_, *end_point_, line_color_, line_width_);
         };
 
@@ -92,7 +117,6 @@ namespace paint
 
         virtual void Invoke(Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
             im.painter.DrawCircle(*center_, radius_, fill_.value_or(false), fill_color_, border_color_, border_width_);
         };
 
@@ -108,6 +132,7 @@ namespace paint
         {
             if (border_width > radius_)
             {
+                std::cerr << "CircleCommand - border_width > radius_!" << std::endl;
                 throw "border_width > radius_";
             }
 
@@ -133,7 +158,6 @@ namespace paint
 
         virtual void Invoke(Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
             im.painter.DrawBucket(*point_, fill_color_);
         };
 
@@ -157,7 +181,6 @@ namespace paint
 
         virtual void Invoke(Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
             im.painter.Crop(*point1_, *point2_);
         };
 
@@ -174,7 +197,6 @@ namespace paint
 
         virtual void Invoke(Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
             im.painter.Resize(*new_size_);
         };
 
@@ -191,7 +213,6 @@ namespace paint
 
         virtual void Invoke(Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
             im.painter.Rotate(rotation_);
         };
 
@@ -207,7 +228,6 @@ namespace paint
 
         virtual void Invoke(Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
             im.painter.InvertColors();
         };
     };
@@ -220,7 +240,6 @@ namespace paint
 
         virtual void Invoke(Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
             im.painter.ConvertToGrayscale();
         };
     };
@@ -233,7 +252,6 @@ namespace paint
 
         virtual void Invoke(Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
             im.Undo();
         };
     };
@@ -246,7 +264,6 @@ namespace paint
 
         virtual void Invoke(Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
             im.Redo();
         };
     };
