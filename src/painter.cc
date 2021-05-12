@@ -6,10 +6,11 @@
 
 #include <set>
 #include <cstring>
+#include <iostream>
 
 namespace paint
 {
-    void Painter::SetNextColor(std::shared_ptr<Color> &color)
+    void Painter::SetNextColor(const std::shared_ptr<Color> &color)
     {
         next_command_color_->SetColor(*color);
     }
@@ -20,7 +21,10 @@ namespace paint
                            const std::optional<Unit> &line_width_)
     {
         if (image_data_.expired())
+        {
+            std::cerr << "Painter::DrawLine - image_data_.expired!" << std::endl;
             throw "image_data_.expired";
+        }
 
         // Lock the image data
         std::shared_ptr<DataPixels> dp = image_data_.lock();

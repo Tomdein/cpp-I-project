@@ -9,8 +9,21 @@ namespace paint
 {
     namespace image_bmp
     {
-        void ImageBMP::CreateImage()
+        void ImageBMP::CreateImage(Point res, [[maybe_unused]] const std::unique_ptr<Color> &color)
         {
+            header_bmp_info_.bi_width = res.x;
+            header_bmp_info_.bi_height = res.y;
+            //TODO: Add support to other types than RGB888.
+            header_bmp_info_.bi_bitCount = BiBitCount::k24bpPX;
+
+            CreateDataBuffer();
+            GenerateMetadata();
+
+            // Attach data to the image painter
+            painter.AttachImageData(image_data_);
+
+            // The data has changed (new data loaded) -> copy the data to undo history
+            ImageEditCallback();
         }
 
         void ImageBMP::LoadImage()
@@ -150,7 +163,10 @@ namespace paint
         {
             // Check if dimensions in BMP header are valid
             if (header_bmp_info_.bi_width == 0 || header_bmp_info_.bi_height == 0)
+            {
+                std::cerr << "Unable to create image data. Image dimensions missing." << std::endl;
                 throw "Unable to create image data. Image dimensions missing.";
+            }
 
             // Get the dimensions from BMP header
             Point image_size{static_cast<int>(header_bmp_info_.bi_width), static_cast<int>(header_bmp_info_.bi_height)};
@@ -169,6 +185,7 @@ namespace paint
                 break;
 
             case k4bpPX:
+                std::cerr << "4bpPX color not implemented yet!" << std::endl;
                 throw "4bpPX color not implemented yet.";
                 break;
 
@@ -206,6 +223,7 @@ namespace paint
 
             size_t color_map_size = 0;
 
+            // Only pixel with size less or equal than 8bit use color map
             switch (header_bmp_info_.bi_bitCount)
             {
             case BiBitCount::k1bpPX:

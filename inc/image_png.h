@@ -48,9 +48,23 @@ namespace paint
             ImagePNG() = default;
             virtual ~ImagePNG() override {}
 
-            virtual void CreateImage() override {}
+            virtual void CreateImage([[maybe_unused]] Point res, [[maybe_unused]] const std::unique_ptr<Color> &color) override {}
             virtual void LoadImage() override;
             virtual void SaveImage() override;
+            /**
+            * @brief Save the data into a BMP image.
+            * 
+            * Works like SaveImage(), but has overload for output file.
+            * 
+            * @param path to the file where to save the image.
+            */
+            virtual void SaveImage(const std::filesystem::path &path) override
+            {
+                file_out_ = File{FileType::kBMP, path};
+                SaveImage();
+            }
+
+            virtual void CreateDataBuffer() override{};
             virtual void GenerateMetadata() override;
 
         private:

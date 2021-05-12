@@ -71,7 +71,7 @@ namespace paint
         // Do not check the file
         if (std::regex_match(line, match, Parser::re_load_))
         {
-            command = std::make_shared<SaveCommand>(std::filesystem::path(match[1].str()));
+            command = std::make_shared<LoadCommand>(std::filesystem::path(match[1].str()));
         }
 
         // SAVE command

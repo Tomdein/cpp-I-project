@@ -86,10 +86,25 @@ Paint:
         ✔ Invert colors @done(21-05-06 18:05)
         ✔ Grayscale @done(21-05-06 18:05)
         ✔ Crop @done(21-05-06 18:05)
-        ✔ Udo @done(21-05-06 18:05)
+        ✔ Undo @done(21-05-06 18:05)
         ✔ Redo @done(21-05-06 18:05)
     Tested parsing:
         ✔ Line @done(21-05-06 18:05)
+
+    Commands:
+        ☐ Load
+        ☐ Save
+        ☐ Color
+        ☐ Circle
+        ☐ Bucket
+        ☐ Resize
+        ☐ Rotate
+        ☐ Invert colors
+        ☐ Grayscale
+        ☐ Crop
+        ☐ Undo
+        ☐ Redo
+        ☐ Line
 
     Pixel data:
         ✔ Data structure for any pixels @done(21-05-06 18:11)
