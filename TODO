@@ -29,7 +29,7 @@ Paint:
             ☐ BiRLE4 (4-bit bitmap)
             ☐ BiRLE8 (8-bit bitmap)
             ☐ BiBitfields (bit field masks)
-            ☐ BiJPED
+            ☐ BiJPEG
             ☐ BiPNG
 
     PNG Support:
@@ -85,16 +85,16 @@ Paint:
         ☐ Load
         ☐ Save
         ☐ Color
+        ✔ Line @done(21-05-14 20:46)
         ☐ Circle
-        ☐ Bucket
-        ☐ Resize
-        ☐ Rotate
-        ☐ Invert colors
-        ☐ Grayscale
-        ☐ Crop
-        ☐ Undo
-        ☐ Redo
-        ☐ Line
+        ✔ Bucket @done(21-05-14 20:46)
+        ✔ Resize @done(21-05-14 20:46)
+        ✔ Rotate @done(21-05-14 20:46)
+        ✔ Invert colors @done(21-05-14 20:46)
+        ✔ Grayscale @done(21-05-14 20:46)
+        ✔ Crop @done(21-05-14 20:46)
+        ✔ Undo @done(21-05-14 20:46)
+        ✔ Redo @done(21-05-14 20:46)
 
     Pixel data:
         ✔ Data structure for any pixels @done(21-05-06 18:11)

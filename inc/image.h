@@ -52,12 +52,25 @@ namespace paint
         virtual void LoadImage() = 0;
         virtual void SaveImage() = 0;
         virtual void SaveImage(const std::filesystem::path &path) = 0;
+        void DumpImageHistory();
 
         /**
          * @brief Sets the output image path
          * 
          */
         void SetOutputImage(const File &file_out) { file_out_ = file_out; }
+
+        /**
+         * @brief Used to figure the image orientation.
+         * 
+         * Method used to figure if the image is drawn 'Top down' or 'Bottom up'.
+         *  Top down - (0, 0) is at the bottom left of the image.
+         *  Bottom up - (0, 0) is at the top left of the image.
+         * 
+         * @return true if data in image is from Top left to Bottom right.
+         * @return false if data in image is from Bottom left to Top right.
+         */
+        virtual bool IsTopDown() const = 0;
 
         /**
          * @brief This method imforms Image that the data has been edited.
@@ -87,7 +100,7 @@ namespace paint
          */
         enum
         {
-            kImageHistorySize = 500,
+            kImageHistorySize = 10,
         };
 
     private:

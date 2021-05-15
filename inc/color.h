@@ -12,7 +12,9 @@
 namespace paint
 {
     class ColorRGB565;
+    class ColorBGR565;
     class ColorRGB888;
+    class ColorBGR888;
     class ColorGrayscale;
     class ColorBW;
 
@@ -25,7 +27,9 @@ namespace paint
         virtual Color *clone() const = 0;
 
         virtual ColorRGB565 ToRGB565() const = 0;
+        virtual ColorBGR565 ToBGR565() const = 0;
         virtual ColorRGB888 ToRGB888() const = 0;
+        virtual ColorBGR888 ToBGR888() const = 0;
         virtual ColorGrayscale ToGrayscale() const = 0;
         virtual ColorBW ToBW() const = 0;
 

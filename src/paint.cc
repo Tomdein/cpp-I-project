@@ -90,14 +90,16 @@ namespace paint
 
     void Paint::CheckCommandFile(std::filesystem::path &commands_file_path_)
     {
-        if ((commands_file_path_.extension().string() != ".txt") | !std::filesystem::exists(commands_file_path_.parent_path()))
-        {
-            throw "Non-existent or unsupported file for batch convert";
-        }
-
         if (!std::filesystem::exists(commands_file_path_))
         {
+            std::cerr << "File with command does not exist: " << commands_file_path_.string() << std::endl;
             throw "File with command does not exist";
+        }
+
+        if (commands_file_path_.extension() != ".txt")
+        {
+            std::cerr << "Unsupported extension '" << commands_file_path_.extension().string() << "' in batch convert file: " << commands_file_path_.string() << std::endl;
+            throw "Unsupported file for batch convert";
         }
     }
 
@@ -155,7 +157,10 @@ To view help write -h or --help, to quit write q
 
         // No commands entered -> end app
         if (commands_.empty())
+        {
+            std::cerr << "PaintCLI::Run - No commands to apply." << std::endl;
             return;
+        }
 
         auto load_command = std::dynamic_pointer_cast<LoadCommand>(commands_.front());
         if (!load_command)
@@ -221,11 +226,21 @@ To view help write -h or --help, to quit write q
             throw "First command is not LOAD command!";
         }
 
-        for (auto &dir_entry : std::filesystem::directory_iterator(load_command->FilePath()))
+        // Check file type
+        auto file_path = load_command->FilePath();
+        auto file_ext = file_path.extension();
+        if (file_ext.string() != ".png" && file_ext.string() != ".bmp")
         {
+            std::cerr << "Unknown file type: '" << file_ext.string() << "', " << file_path << std::endl;
+            throw unknown_file_error(file_path);
+        }
+
+        for (auto &dir_entry : std::filesystem::directory_iterator(file_path))
+        {
+            // Try reading all files
             try
             {
-                if (dir_entry.is_regular_file())
+                if (dir_entry.path().extension() == file_ext && dir_entry.is_regular_file())
                 {
                     auto img = CreateImageByExtension(dir_entry.path());
                     img->LoadImage();
@@ -237,6 +252,12 @@ To view help write -h or --help, to quit write q
             {
                 // Do nothing
             }
+        }
+
+        if (commands_.empty())
+        {
+            std::cerr << "PaintFile::Run - No commands to apply." << std::endl;
+            return;
         }
 
         // Run each command.
@@ -273,9 +294,14 @@ To view help write -h or --help, to quit write q
             return;
         }
 
-        std::ifstream file;
+        // Prepare file
+        std::ifstream file(commands_file_path_);
+        if (!file.is_open())
+            perror(("error while opening file: " + commands_file_path_.string()).c_str());
 
-        file.exceptions(std::ios_base::badbit | std::ios_base::failbit | std::ios_base::eofbit);
+        // Open and parse the file
+        bool failed_to_parse_command = false;
+        auto command_counter = 0;
 
         bool exit = false;
         std::string line;
@@ -285,7 +311,10 @@ To view help write -h or --help, to quit write q
         while (!exit)
         {
             // Read a line
-            std::getline(file, line);
+            if (!std::getline(file, line))
+                break;
+
+            command_counter++;
 
             // Try parsing the input as command
             try
@@ -294,16 +323,37 @@ To view help write -h or --help, to quit write q
             }
             catch (parse_error &e)
             {
-                std::cerr << e.what() << ": '" << e.error_substring() << "'\n";
+                std::cerr << e.what() << " [" << command_counter << "]: " << e.error_substring() << "\n";
+                failed_to_parse_command = true;
             }
         }
 
-        // TODO: Run each command.
-        std::for_each(commands_.begin(), commands_.end(), [this](auto &command) {
-            if (command->CommandName() == "SaveCommand")
-                image_->painter.Resize(PointPX(output_resolution_.x, output_resolution_.y));
+        // Ask whether to continue if Painter failed to parse any command
+        if (failed_to_parse_command)
+        {
+            std::cout << "Painter failed to parse some commands. Continue to save? [Y/N]" << std::endl;
+            std::string confirmation;
+            std::cin >> confirmation;
 
+            if (confirmation != "Y" && confirmation != "y")
+                return;
+        }
+
+        // No commands entered -> end app
+        if (commands_.empty())
+        {
+            std::cerr << "PaintFile::Run - No commands to apply." << std::endl;
+            return;
+        }
+
+        // Apply all valid parsed commands
+        std::for_each(commands_.begin(), commands_.end(), [this](auto &command) {
             command->Invoke(*image_);
         });
+
+        // Resize the image to final size and save
+        image_->painter.Resize(PointPX(output_resolution_.x, output_resolution_.y));
+        image_->DumpImageHistory();
+        image_->SaveImage(output_file_path_);
     }
 }

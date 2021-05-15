@@ -15,6 +15,31 @@ namespace paint
         next_command_color_->SetColor(*color);
     }
 
+    void Painter::ClearImage(const std::optional<std::shared_ptr<Color>> &clear_color)
+    {
+        std::shared_ptr<Color> color = clear_color.value_or(std::make_shared<ColorRGB888>(255, 255, 255));
+
+        if (image_data_.expired())
+        {
+            std::cerr << "Painter::DrawLine - image_data_.expired!" << std::endl;
+            throw "image_data_.expired";
+        }
+
+        // Lock the image data
+        std::shared_ptr<DataPixels> dp = image_data_.lock();
+
+        // Init color
+        auto fill_color = dp->GetColorType();
+        fill_color->SetColor(*clear_color.value_or(next_command_color_));
+        auto fill_color_data = reinterpret_cast<uint8_t *>(fill_color->GetData());
+        auto fill_color_data_size = fill_color->GetDataSize();
+
+        for (auto data_it : *dp)
+        {
+            std::copy_n(fill_color_data, fill_color_data_size, reinterpret_cast<uint8_t *>(data_it));
+        }
+    }
+
     void Painter::DrawLine(const BasePoint &start,
                            const BasePoint &end,
                            const std::optional<std::shared_ptr<Color>> &line_color_,
@@ -29,12 +54,23 @@ namespace paint
         // Lock the image data
         std::shared_ptr<DataPixels> dp = image_data_.lock();
 
+        // Get line points and width
         Point l_start = start.GetPointPX(dp->image_size_);
         Point l_end = end.GetPointPX(dp->image_size_);
-        std::shared_ptr<Color> l_color = line_color_.value_or(next_command_color_);
         float l_width_half = line_width_.value_or(1) / 2.0f;
 
-        // TODO reverse the vector if it is in direction of [-1,-1]. It would break the algorithm if THE loop
+        // If image data is horizontaly mirrored -> flip line horizontaly
+        if (draw_bottom_up_)
+        {
+            l_start = Point{l_start.x, dp->image_size_.y - l_start.y};
+            l_end = Point{l_end.x, dp->image_size_.y - l_end.y};
+        }
+
+        // Init Color
+        auto l_color = dp->GetColorType();
+        l_color->SetColor(*line_color_.value_or(next_command_color_));
+
+        //TODO: reverse the vector if it is in direction of [-1,-1]. It would break the algorithm if THE loop
         //      or do some checks/swaps in the loop
         // Calculate parameters of line equations
         line t{static_cast<float>(l_start.y - l_end.y),
@@ -112,9 +148,20 @@ namespace paint
 
         // Get parameters
         Point cen = center.GetPointPX(image_size);
-        std::shared_ptr<Color> fill_c(fill_color.value_or(next_command_color_));
-        std::shared_ptr<Color> border_c(border_color.value_or(next_command_color_));
         Unit border_w = border_width.value_or(1);
+
+        // If image data is horizontaly mirrored -> flip licircle center horizontaly
+        if (draw_bottom_up_)
+        {
+            cen = Point{cen.x, dp->image_size_.y - cen.y};
+        }
+
+        // Init colors
+        auto fill_c = dp->GetColorType();
+        fill_c->SetColor(*fill_color.value_or(next_command_color_));
+
+        auto border_c = dp->GetColorType();
+        border_c->SetColor(*border_color.value_or(next_command_color_));
 
         // Create circles
         Circle c_outer{cen, radius + static_cast<int>(std::round(static_cast<float>(border_w) / 2.0f))};
@@ -182,7 +229,7 @@ namespace paint
         image_edit_callback_();
     }
 
-    void Painter::DrawBucket(const BasePoint &point, const std::optional<std::shared_ptr<Color>> &fill_color)
+    void Painter::DrawBucket(const BasePoint &point, const std::optional<std::shared_ptr<Color>> &fill_color_in)
     {
         if (image_data_.expired())
             throw "image_data_.expired";
@@ -198,6 +245,12 @@ namespace paint
         if (p.x < 0 || p.x >= image_size.x || p.y < 0 || p.y >= image_size.y)
             return;
 
+        // If image data is horizontaly mirrored -> flip starting point horizontaly
+        if (draw_bottom_up_)
+        {
+            p = Point{p.x, dp->image_size_.y - p.y};
+        }
+
         // Init 2 sets used for breadth search
         std::set<int> pixels_to_search;
         std::set<int> pixels_to_change;
@@ -209,7 +262,9 @@ namespace paint
         picked_color->SetFromData((*dp)[first_idx]);
         size_t color_size_bytes(picked_color->GetDataSize());
 
-        void *fill_data_ptr = fill_color.value_or(next_command_color_)->GetData();
+        auto fill_color = dp->GetColorType();
+        fill_color->SetColor(*fill_color_in.value_or(next_command_color_));
+        auto fill_data_ptr = reinterpret_cast<uint8_t *>(fill_color->GetData());
 
         // Search pixels to replace
         while (!pixels_to_search.empty() || !pixels_to_change.empty())
@@ -217,7 +272,7 @@ namespace paint
             // Iterate through all found pixels with the same color in previous iteration
             std::for_each(pixels_to_change.begin(), pixels_to_change.end(), [&](auto &i) {
                 // Change the color of the pixel to fill_color
-                std::copy_n(reinterpret_cast<uint8_t *>(fill_data_ptr), color_size_bytes, reinterpret_cast<uint8_t *>((*dp)[i]));
+                std::copy_n(fill_data_ptr, color_size_bytes, reinterpret_cast<uint8_t *>((*dp)[i]));
             });
 
             // Clear pixels_to_search
@@ -269,6 +324,13 @@ namespace paint
         // Retrieve unit in PX
         Point c1 = corner1.GetPointPX(dp->image_size_);
         Point c2 = corner2.GetPointPX(dp->image_size_);
+
+        // If image data is horizontaly mirrored -> flip starting points horizontaly
+        if (draw_bottom_up_)
+        {
+            c1 = Point{c1.x, dp->image_size_.y - c1.y};
+            c2 = Point{c2.x, dp->image_size_.y - c2.y};
+        }
 
         // Set p1 as the top left point and p2 as the bottom right point
         Point p1{std::min(c1.x, c2.x), std::min(c1.y, c2.y)};
@@ -332,6 +394,11 @@ namespace paint
         Point image_size = dp->image_size_;
 
         Point new_image_size = new_size.GetPointPX(image_size);
+
+        // Desired image has the same size -> no resize needed
+        if (new_image_size == image_size)
+            return;
+
         vec2f multiplier{static_cast<float>(image_size.x) / static_cast<float>(new_image_size.x),
                          static_cast<float>(image_size.y) / static_cast<float>(new_image_size.y)};
 
@@ -432,8 +499,8 @@ namespace paint
 
         int pixel_count = image_size.x * image_size.y;
 
-        // Counter Clockwise rotation
-        if (rotation == Rotation::kCounterClock)
+        // Clockwise rotation for 'bottom up' images, Counter Clockwise rotation for 'top down' images
+        if ((rotation == Rotation::kClock) ^ draw_bottom_up_)
         {
             // Go up from bottom left, then to the right (inside old image)
             int idx = image_size.x * (image_size.y - 1);
@@ -454,7 +521,7 @@ namespace paint
                 std::copy_n(reinterpret_cast<uint8_t *>((*dp)[idx]), color_size_bytes, reinterpret_cast<uint8_t *>(*it));
             }
         }
-        // Clockwise rotation
+        // Counter Clockwise rotation for 'bottom up' images, Clockwise rotation for 'top down' images
         else
         {
             // Go down from top right, then one to the left
@@ -519,27 +586,6 @@ namespace paint
 
         dp->TransformToColorType(std::unique_ptr<Color>(new ColorGrayscale(0)));
 
-        // Point image_size = dp->image_size_;
-        // std::shared_ptr<Color> old_color(dp->GetColorType());
-
-        // // Create new data
-        // std::shared_ptr<Color> new_color_grayscale(new ColorGrayscale(0));
-        // std::shared_ptr<DataPixels> new_data_pixels = std::make_shared<DataPixels>(Point{image_size.y, image_size.x}, dp->GetColorType());
-        // size_t new_color_size_bytes = new_color_grayscale->GetDataSize();
-
-        // int pixel_count = image_size.x * image_size.y;
-
-        // // Load each pixel from old data, convert to grayscale and save into new data
-        // for (int idx = 0; idx < pixel_count; idx++)
-        // {
-        //     // Copy data from pixel to color
-        //     old_color->SetFromData((*dp)[idx]);
-        //     new_color_grayscale->SetColor(*old_color);
-        //     std::copy_n(reinterpret_cast<uint8_t *>(new_color_grayscale->GetData()), new_color_size_bytes, reinterpret_cast<uint8_t *>((*dp)[idx]));
-        // }
-
-        // throw "image_data_.expired"; // No grayscale color (new_color) whut are you doin?
-
         // Call back that image was edited
         image_edit_callback_();
     }
@@ -553,27 +599,6 @@ namespace paint
         std::shared_ptr<DataPixels> dp = image_data_.lock();
 
         dp->TransformToColorType(std::unique_ptr<Color>(new ColorBW(0)));
-
-        // Point image_size = dp->image_size_;
-        // std::shared_ptr<Color> old_color(dp->GetColorType());
-
-        // // Create new data
-        // std::shared_ptr<Color> new_color_grayscale(new ColorGrayscale(0));
-        // std::shared_ptr<DataPixels> new_data_pixels = std::make_shared<DataPixels>(Point{image_size.y, image_size.x}, dp->GetColorType());
-        // size_t new_color_size_bytes = new_color_grayscale->GetDataSize();
-
-        // int pixel_count = image_size.x * image_size.y;
-
-        // // Load each pixel from old data, convert to grayscale and save into new data
-        // for (int idx = 0; idx < pixel_count; idx++)
-        // {
-        //     // Copy data from pixel to color
-        //     old_color->SetFromData((*dp)[idx]);
-        //     new_color_grayscale->SetColor(*old_color);
-        //     std::copy_n(reinterpret_cast<uint8_t *>(new_color_grayscale->GetData()), new_color_size_bytes, reinterpret_cast<uint8_t *>((*dp)[idx]));
-        // }
-
-        // throw "image_data_.expired"; // No grayscale color (new_color) whut are you doin?
 
         // Call back that image was edited
         image_edit_callback_();

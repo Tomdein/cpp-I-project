@@ -33,6 +33,7 @@ int main()
     image.SetOutputImage(paint::File{paint::FileType::kBMP, "../../images/out_line.bmp"});
     image.painter.DrawLine(paint::PointPX(17, 0), paint::PointPX(0, 29), std::make_optional<std::shared_ptr<paint::Color>>(new paint::ColorRGB888(0, 255, 0)), std::make_optional<paint::Unit>(5));
     image.painter.DrawLine(paint::PointPX(5, 7), paint::PointPX(15, 17), std::make_optional<std::shared_ptr<paint::Color>>(new paint::ColorRGB888(127, 127, 127)), std::make_optional<paint::Unit>(2));
+    image.painter.DrawLine(paint::PointPer(50, 50), paint::PointPer(100, 100), std::make_optional<std::shared_ptr<paint::Color>>(new paint::ColorRGB888(255, 0, 0)), std::make_optional<paint::Unit>(2));
     // image.painter.DrawLine(paint::PointPX(0, 0), paint::PointPX(18, 30), std::make_optional<std::shared_ptr<paint::Color>>(new paint::ColorRGB888(0, 255, 0)), std::make_optional<paint::Unit>(3));
     image.SaveImage();
 

@@ -37,8 +37,14 @@ list(APPEND PaintSources ${image_iobmp})
 get_filename_component(color_rgb888 ./src/color_rgb888.cc ABSOLUTE)
 list(APPEND PaintSources ${color_rgb888})
 
+get_filename_component(color_bgr888 ./src/color_bgr888.cc ABSOLUTE)
+list(APPEND PaintSources ${color_bgr888})
+
 get_filename_component(color_rgb565 ./src/color_rgb565.cc ABSOLUTE)
 list(APPEND PaintSources ${color_rgb565})
+
+get_filename_component(color_bgr565 ./src/color_bgr565.cc ABSOLUTE)
+list(APPEND PaintSources ${color_bgr565})
 
 get_filename_component(color_grayscale ./src/color_grayscale.cc ABSOLUTE)
 list(APPEND PaintSources ${color_grayscale})

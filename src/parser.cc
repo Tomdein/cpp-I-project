@@ -45,22 +45,22 @@ namespace paint
         }
     }
 
-    std::regex Parser::re_save_ = std::regex("^SAVE\\s([a-zA-Z0-9\\s\\\\/._-]+)$");
-    std::regex Parser::re_load_ = std::regex("^LOAD\\s([a-zA-Z0-9\\s\\\\/._-]+)$");
-    std::regex Parser::re_color_ = std::regex("^COLOR\\s(\\d{1,3})\\s(\\d{1,3})\\s(\\d{1,3})$");
-    std::regex Parser::re_line_ = std::regex("^LINE\\s(%|PX)\\s(\\d+)\\s(\\d+)\\s(\\d+)\\s(\\d+)(:?\\s\\{(.+)\\})?$");
-    std::regex Parser::re_circle_ = std::regex("^CIRCLE\\s(%|PX)\\s(\\d+)\\s(\\d+)\\s(\\d+)(:?\\s\\{(.+)\\})?$");
-    std::regex Parser::re_bucket_ = std::regex("^BUCKET\\s(%|PX)\\s(\\d+)\\s(\\d+)(:?\\s\\{(.+)\\})?$");
-    std::regex Parser::re_resize_ = std::regex("^RESIZE\\s(%|PX)\\s(\\d+)\\s(\\d+)$");
-    std::regex Parser::re_rotate_ = std::regex("^ROTATE\\s(CLOCK|COUNTERCLOCK)$");
-    std::regex Parser::re_invert_colors_ = std::regex("^INVERTCOLORS$");
-    std::regex Parser::re_grayscale_ = std::regex("^GRAYSCALE$");
-    std::regex Parser::re_crop_ = std::regex("^CROP\\s(%|PX)\\s(\\d+)\\s(\\d+)\\s(\\d+)\\s(\\d+)$");
-    std::regex Parser::re_undo_ = std::regex("^UNDO$");
-    std::regex Parser::re_redo_ = std::regex("^REDO$");
-    std::regex Parser::re_param_delim_ = std::regex(",\\s(?=[^\\{\\}]*\\{[^\\{\\}]*\\}|[^\\{\\}]+$)");
-    std::regex Parser::re_param_ = std::regex("^([a-z-]+):\\s(?:([a-z0-9-]+)|\\{(.+)\\})$");
-    std::regex Parser::re_param_color_ = std::regex("^r:\\s(\\d{1,3}),\\sg:\\s(\\d{1,3}),\\sb:\\s(\\d{1,3})$");
+    std::regex Parser::re_save_ = std::regex("^SAVE\\s([a-zA-Z0-9\\s\\\\/._-]+)\\r?\\n?$");
+    std::regex Parser::re_load_ = std::regex("^LOAD\\s([a-zA-Z0-9\\s\\\\/._-]+)\\r?\\n?$");
+    std::regex Parser::re_color_ = std::regex("^COLOR\\s(\\d{1,3})\\s(\\d{1,3})\\s(\\d{1,3})\\r?\\n?$");
+    std::regex Parser::re_line_ = std::regex("^LINE\\s(%|PX)\\s(\\d+)\\s(\\d+)\\s(\\d+)\\s(\\d+)(:?\\s\\{(.+)\\})?\\r?\\n?$");
+    std::regex Parser::re_circle_ = std::regex("^CIRCLE\\s(%|PX)\\s(\\d+)\\s(\\d+)\\s(\\d+)(:?\\s\\{(.+)\\})?\\r?\\n?$");
+    std::regex Parser::re_bucket_ = std::regex("^BUCKET\\s(%|PX)\\s(\\d+)\\s(\\d+)(:?\\s\\{(.+)\\})?\\r?\\n?$");
+    std::regex Parser::re_resize_ = std::regex("^RESIZE\\s(%|PX)\\s(\\d+)\\s(\\d+)\\r?\\n?$");
+    std::regex Parser::re_rotate_ = std::regex("^ROTATE\\s(CLOCK|COUNTERCLOCK)\\r?\\n?$");
+    std::regex Parser::re_invert_colors_ = std::regex("^INVERTCOLORS\\r?\\n?$");
+    std::regex Parser::re_grayscale_ = std::regex("^GRAYSCALE\\r?\\n?$");
+    std::regex Parser::re_crop_ = std::regex("^CROP\\s(%|PX)\\s(\\d+)\\s(\\d+)\\s(\\d+)\\s(\\d+)\\r?\\n?$");
+    std::regex Parser::re_undo_ = std::regex("^UNDO\\r?\\n?$");
+    std::regex Parser::re_redo_ = std::regex("^REDO\\r?\\n?$");
+    std::regex Parser::re_param_delim_ = std::regex(",\\s(?=[^\\{\\}]*\\{[^\\{\\}]*\\}|[^\\{\\}]+$\\r?\\n?)");
+    std::regex Parser::re_param_ = std::regex("^([a-z-]+):\\s(?:([a-z0-9-]+)|\\{(.+)\\})\\r?\\n?$");
+    std::regex Parser::re_param_color_ = std::regex("^r:\\s(\\d{1,3}),\\sg:\\s(\\d{1,3}),\\sb:\\s(\\d{1,3})\\r?\\n?$");
 
     std::shared_ptr<Command> Parser::ParseLine(const std::string &line)
     {
@@ -282,6 +282,8 @@ namespace paint
                     }
                 }
             }
+
+            command = std::move(bucket_command);
         }
 
         // RESIZE command
@@ -299,6 +301,7 @@ namespace paint
                 resize_command = std::make_shared<ResizeCommand>(std::make_shared<PointPX>(std::stoi(match[2].str()),
                                                                                            std::stoi(match[3].str())));
             }
+
             command = std::move(resize_command);
         }
 
@@ -315,6 +318,8 @@ namespace paint
             {
                 rotate_command = std::make_shared<RotateCommand>(Rotation::kCounterClock);
             }
+
+            command = std::move(rotate_command);
         }
 
         // INVERT_COLOR command

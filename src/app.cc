@@ -42,7 +42,10 @@ int main(int argc, char **argv)
 
             // Match the resolution with regex
             if (!std::regex_match(string_res, match, re_resolution))
+            {
+                std::cerr << "Could not parse image size: " << string_res << std::endl;
                 throw paint::parse_error(argv[2]);
+            }
 
             // Create app
             paint::PaintFile app(path_in, paint::Point{stoi(match[1].str()), stoi(match[2].str())}, path_out);

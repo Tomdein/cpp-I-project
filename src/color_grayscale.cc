@@ -7,9 +7,19 @@ namespace paint
         return ColorRGB565(grayscale_palette_[pixel_.w].r, grayscale_palette_[pixel_.w].g, grayscale_palette_[pixel_.w].b);
     }
 
+    ColorBGR565 ColorGrayscale::ToBGR565() const
+    {
+        return ColorBGR565(grayscale_palette_[pixel_.w].b, grayscale_palette_[pixel_.w].g, grayscale_palette_[pixel_.w].r);
+    }
+
     ColorRGB888 ColorGrayscale::ToRGB888() const
     {
         return ColorRGB888(grayscale_palette_[pixel_.w].r, grayscale_palette_[pixel_.w].g, grayscale_palette_[pixel_.w].b);
+    }
+
+    ColorBGR888 ColorGrayscale::ToBGR888() const
+    {
+        return ColorBGR888(grayscale_palette_[pixel_.w].b, grayscale_palette_[pixel_.w].g, grayscale_palette_[pixel_.w].r);
     }
 
     ColorGrayscale ColorGrayscale::ToGrayscale() const

@@ -49,6 +49,18 @@ namespace paint
                 SaveImage();
             }
 
+            /**
+            * @brief Used to figure the image orientation.
+            * 
+            * Method used to figure if the image is drawn 'Top down' or 'Bottom up'.
+            *  Top down - (0, 0) is at the bottom left of the image.
+            *  Bottom up - (0, 0) is at the top left of the image.
+            * 
+            * @return true if data in image is from Top left to Bottom right.
+            * @return false if data in image is from Bottom left to Top right.
+            */
+            virtual bool IsTopDown() const { return true; }
+
         private:
             ChunkIHDR chunk_ihdr_;
 

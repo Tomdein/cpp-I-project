@@ -50,6 +50,27 @@ namespace paint
     };
 
     /**
+     * @brief A structure for storing 3 bytes wide BGR color.
+     * 
+     * This structure saves BGR color information in 3 bytes:
+     *  8 bits for blue color
+     *  8 bits for green color
+     *  8 bits for red color
+     * 
+     */
+    struct PixelBGR888
+    {
+        uint8_t b : 8; /// Blue color
+        uint8_t g : 8; /// Green color
+        uint8_t r : 8; /// Red color
+
+        bool operator==(const PixelBGR888 &other) const
+        {
+            return r == other.r && g == other.g && b == other.b;
+        }
+    };
+
+    /**
      * @brief A structure for storing 2 bytes wide RGB color.
      * 
      * This structure saves RGB color information in 2 bytes:
@@ -65,6 +86,27 @@ namespace paint
         uint16_t b : 5; /// Blue color
 
         bool operator==(const PixelRGB565 &other) const
+        {
+            return r == other.r && g == other.g && b == other.b;
+        }
+    };
+
+    /**
+     * @brief A structure for storing 2 bytes wide BGR color.
+     * 
+     * This structure saves BGR color information in 2 bytes:
+     *  5 bits for blue color
+     *  6 bits for green color
+     *  5 bits for red color
+     * 
+     */
+    struct PixelBGR565
+    {
+        uint16_t b : 5; /// Blue color
+        uint16_t g : 6; /// Green color
+        uint16_t r : 5; /// Red color
+
+        bool operator==(const PixelBGR565 &other) const
         {
             return r == other.r && g == other.g && b == other.b;
         }

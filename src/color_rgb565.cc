@@ -7,9 +7,19 @@ namespace paint
         return ColorRGB565(*this);
     }
 
+    ColorBGR565 ColorRGB565::ToBGR565() const
+    {
+        return ColorBGR565(pixel_.b, pixel_.g, pixel_.r);
+    }
+
     ColorRGB888 ColorRGB565::ToRGB888() const
     {
         return ColorRGB888(pixel_.r << 3, pixel_.g << 2, pixel_.b << 3);
+    }
+
+    ColorBGR888 ColorRGB565::ToBGR888() const
+    {
+        return ColorBGR888(pixel_.b << 3, pixel_.g << 2, pixel_.r << 3);
     }
 
     ColorGrayscale ColorRGB565::ToGrayscale() const

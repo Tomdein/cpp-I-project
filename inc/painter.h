@@ -7,8 +7,8 @@
 
 #include "unit.h"
 #include "point.h"
-#include "color.h"
 #include "color_rgb888.h"
+#include "color.h"
 #include "rotation.h"
 #include "data_pixels.h"
 
@@ -27,7 +27,7 @@ namespace paint
     class Painter
     {
     public:
-        Painter(std::function<void()> image_edit_callback) : image_edit_callback_{std::move(image_edit_callback)}
+        Painter(std::function<void()> image_edit_callback, bool draw_bottom_up = false) : image_edit_callback_{std::move(image_edit_callback)}, draw_bottom_up_{draw_bottom_up}
         {
             // Set default color to black
             next_command_color_ = std::make_shared<ColorRGB888>(0, 0, 0);
@@ -52,6 +52,13 @@ namespace paint
         }
 
         /**
+         * @brief Set whether connected data is 'top down' or 'bottom up'.
+         * 
+         * @param is_bottom_up if attached data is 'bottom up'.
+         */
+        void SetHorizontalOrientation(bool is_bottom_up) { draw_bottom_up_ = is_bottom_up; }
+
+        /**
          * @brief Sets the global color.
          * 
          * Sets the global color that is used for drawing when no color is specified when drawing.
@@ -59,6 +66,8 @@ namespace paint
          * @param color new global color.
          */
         void SetNextColor(const std::shared_ptr<Color> &color);
+
+        void ClearImage(const std::optional<std::shared_ptr<Color>> &clear_color);
 
         /**
          * @brief Draws a line from start to end.
@@ -155,6 +164,8 @@ namespace paint
         std::weak_ptr<DataPixels> image_data_;      /// Data of the image to draw in.
 
         std::function<void()> image_edit_callback_; /// Imgage::ImageEditCallback() used to notify Image of the data change after editing.
+
+        bool draw_bottom_up_;
     };
 }
 

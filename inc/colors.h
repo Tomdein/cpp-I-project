@@ -5,7 +5,9 @@
 
 #include "color.h"
 #include "color_rgb565.h"
+#include "color_bgr565.h"
 #include "color_rgb888.h"
+#include "color_bgr888.h"
 #include "color_grayscale.h"
 #include "color_bw.h"
 

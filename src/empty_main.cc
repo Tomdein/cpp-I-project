@@ -1,10 +1,11 @@
 #include <iostream>
 #include <fstream>
 
-#include "color_grayscale.h"
+#include "parser.h"
 
 int main(int, char *[])
 {
+
     // std::cout << sizeof(paint::grayscale_palette) << std::endl;
 
     // std::ofstream f("../../src/dummy.cc", std::ios_base::out);

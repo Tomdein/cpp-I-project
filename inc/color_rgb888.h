@@ -28,7 +28,9 @@ namespace paint
         bool operator==(const ColorRGB888 &other) const { return pixel_ == other.pixel_; }
 
         virtual ColorRGB565 ToRGB565() const override;
+        virtual ColorBGR565 ToBGR565() const override;
         virtual ColorRGB888 ToRGB888() const override;
+        virtual ColorBGR888 ToBGR888() const override;
         virtual ColorGrayscale ToGrayscale() const override;
         virtual ColorBW ToBW() const override;
 

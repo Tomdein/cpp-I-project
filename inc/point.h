@@ -15,6 +15,11 @@ namespace paint
     {
         Unit x = 0;
         Unit y = 0;
+
+        bool operator==(const Point &other) const
+        {
+            return x == other.x && y == other.y;
+        }
     };
 
     /**
@@ -81,8 +86,12 @@ namespace paint
          */
         virtual Point GetPointPX(const Point &dimensions) const override
         {
-            return Point{static_cast<Unit>(std::roundf(dimensions.x * x_)),
-                         static_cast<Unit>(roundf(dimensions.y * y_))};
+            return Point{static_cast<Unit>((dimensions.x * x_) / 100),
+                         static_cast<Unit>((dimensions.y * y_) / 100)};
+
+            //TODO: Units in decimal?
+            // return Point{static_cast<Unit>(std::roundf(dimensions.x * x_)),
+            //              static_cast<Unit>(std::roundf(dimensions.y * y_))};
         };
 
     private:

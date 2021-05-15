@@ -1,4 +1,18 @@
 {
+    "cmake.debugConfig": {
+        // "cwd": "${command:cmake.launchTargetDirectory}",
+        "cwd": "${workspaceFolder}",
+        "args": [
+            "drawCzFlagCommands.txt",
+            "3000,2000",
+            "czFlag.bmp"
+        ]
+        // "args": [
+        //     "drawLineCommand.txt",
+        //     "3000,2000",
+        //     "czFlag.bmp"
+        // ]
+    },
     "files.associations": {
         "deque": "cpp",
         "array": "cpp",

@@ -102,6 +102,7 @@ namespace paint
             {
                 file_in_ = File{FileType::kBMP, input_file_path};
                 file_out_ = File{FileType::kBMP, input_file_path};
+                painter.SetHorizontalOrientation(true);
             }
             virtual ~ImageBMP() override {}
 
@@ -139,10 +140,16 @@ namespace paint
             }
 
             /**
-             * @brief Saves all images from history.
-             * 
-             */
-            void SaveBuffer();
+            * @brief Used to figure the image orientation.
+            * 
+            * Method used to figure if the image is drawn 'Top down' or 'Bottom up'.
+            *  Top down - (0, 0) is at the bottom left of the image.
+            *  Bottom up - (0, 0) is at the top left of the image.
+            * 
+            * @return true if data in image is from Top left to Bottom right.
+            * @return false if data in image is from Bottom left to Top right.
+            */
+            virtual bool IsTopDown() const { return false; }
 
         private:
             HeaderBMP header_bmp_;          /// BMP header struct.

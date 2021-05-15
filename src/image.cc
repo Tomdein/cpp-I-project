@@ -1,7 +1,48 @@
 #include "image.h"
 
+#include <iostream>
+
 namespace paint
 {
+    void Image::DumpImageHistory()
+    {
+        // Clear image_dump dir
+        std::filesystem::remove_all("./image_dump");
+
+        // Create image_dump dir
+        if (!std::filesystem::create_directory("./image_dump"))
+        {
+            std::cerr << "Could not create image_dump directory!" << std::endl;
+            return;
+        }
+
+        int idx = 0;
+        auto save_data = image_data_;
+
+        // Go through every picture in undo history and save it
+        for (auto &img_data : image_data_undo_history_)
+        {
+            // Set file name and filepath
+            std::stringstream s;
+            s.str(std::string());
+            s << "./image_dump/img_" << idx << ".bmp";
+
+            // Set data
+            image_data_ = img_data;
+
+            //TODO: support dumping in different formats.
+            // file_out_ = File{FileType::kBMP, s.str()};
+            // SaveImage(file_out_);
+
+            // Save the image
+            SaveImage(s.str());
+
+            idx++;
+        }
+
+        image_data_ = save_data;
+    }
+
     void Image::Undo()
     {
         // If no image to return to -> nothing to do
@@ -29,9 +70,7 @@ namespace paint
 
         // If image_data_redo_history is full -> remove last image
         if (image_data_redo_history_.size() > kImageHistorySize)
-        {
             image_data_redo_history_.pop_front();
-        }
 
         // Set the image from undo list as current
         image_data_.swap(new_data);
@@ -57,9 +96,7 @@ namespace paint
 
         // If image_data_undo_history is full -> remove last image
         if (image_data_undo_history_.size() > kImageHistorySize)
-        {
             image_data_undo_history_.pop_front();
-        }
 
         // Set the image from redo list as current
         image_data_.swap(new_data);
@@ -79,10 +116,9 @@ namespace paint
         // Save the duplicated data into history -> image_data_ is ready to be drawn on
         image_data_undo_history_.emplace_back(std::move(data_copy));
 
+        // Undo buffer is full -> remove front image (the oldest image)
         if (image_data_undo_history_.size() > kImageHistorySize)
-        {
             image_data_undo_history_.pop_front();
-        }
 
         undo_was_last_command_ = false;
     }

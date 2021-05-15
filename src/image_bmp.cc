@@ -52,7 +52,10 @@ namespace paint
                     header_bmp_info_.bi_bitCount != BiBitCount::k16bpPX &&
                     header_bmp_info_.bi_bitCount != BiBitCount::k8bpPX &&
                     header_bmp_info_.bi_bitCount != BiBitCount::k1bpPX)
-                    throw "Only RGB888 & RGB565 & Grayscale & BW is implemented.";
+                {
+                    std::cerr << "Only RGB888 & RGB565 & Grayscale & BW is implemented!" << std::endl;
+                    throw "Only RGB888 & RGB565 & Grayscale & BW is implemented";
+                }
 
                 // Create data structure for editing the pixels
                 CreateDataBuffer();
@@ -201,7 +204,7 @@ namespace paint
 
             // RGB888
             case k24bpPX:
-                color = std::make_unique<ColorRGB888>(0, 0, 0);
+                color = std::make_unique<ColorBGR888>(0, 0, 0);
                 break;
             }
 
@@ -234,34 +237,9 @@ namespace paint
                 break;
             }
 
+            header_bmp_.bf_type = kBfType;
             header_bmp_.bf_size = header_bmp_info_.bi_sizeImage + sizeof(HeaderBMP) + sizeof(HeaderBMPInfo) + color_map_size;
             header_bmp_.bf_offBits = 0x36 + color_map_size;
-        }
-
-        void ImageBMP::SaveBuffer()
-        {
-
-            throw "TODO";
-
-            // Create image_dump dir
-            std::filesystem::create_directory("./image_dump");
-
-            int idx = 0;
-
-            // Go through every picture in undo history and save it
-            for ([[maybe_unused]] auto &img : this->image_data_undo_history_)
-            {
-                // Set file name and filepath
-                std::stringstream s;
-                s.str(std::string());
-                s << "./image_dump/img_" << idx << ".bmp";
-                file_out_ = File{FileType::kBMP, s.str()};
-
-                // Save the image
-                SaveImage();
-
-                idx++;
-            }
         }
     }
 

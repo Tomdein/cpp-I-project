@@ -35,7 +35,7 @@ namespace paint
 
         virtual void Invoke([[maybe_unused]] Image &im) override
         {
-            std::cout << "TODO: " << this->CommandName() << "::Invoke\n";
+            std::cerr << "LoadCommand should not be invoked! " << this->CommandName() << "::Invoke\n";
         };
 
         std::filesystem::path FilePath() const

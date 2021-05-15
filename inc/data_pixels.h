@@ -195,8 +195,10 @@ namespace paint
             {
                 // Copy from data_ to old_color
                 std::copy_n(reinterpret_cast<uint8_t *>(*it_old), pixel_struct_size_byte_, reinterpret_cast<uint8_t *>(old_color_data_ptr));
+
                 // Set grayscale_color from old_color
                 new_color->SetColor(*data_color_);
+
                 // Copy grayscale_color data to new_data
                 std::copy_n(reinterpret_cast<uint8_t *>(new_color_data_ptr), new_pixel_size, reinterpret_cast<uint8_t *>(*it_new));
             }
