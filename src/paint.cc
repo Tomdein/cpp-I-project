@@ -424,7 +424,6 @@ To view help write -h or --help, to quit write q
 
         // Resize the image to final size and save
         image_->painter.Resize(PointPX(output_resolution_.x, output_resolution_.y));
-        image_->DumpImageHistory();
         image_->SaveImage(output_file_path_);
     }
 }
