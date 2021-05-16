@@ -45,8 +45,8 @@ namespace paint
         }
     }
 
-    std::regex Parser::re_save_ = std::regex("^SAVE\\s([a-zA-Z0-9\\s\\\\/._-]+)\\r?\\n?$");
-    std::regex Parser::re_load_ = std::regex("^LOAD\\s([a-zA-Z0-9\\s\\\\/._-]+)\\r?\\n?$");
+    std::regex Parser::re_save_ = std::regex("^SAVE\\s([a-zA-Z0-9\\s\\\\/\\*._-]+)\\r?\\n?$");
+    std::regex Parser::re_load_ = std::regex("^LOAD\\s([a-zA-Z0-9\\s\\\\/\\*._-]+)\\r?\\n?$");
     std::regex Parser::re_color_ = std::regex("^COLOR\\s(\\d{1,3})\\s(\\d{1,3})\\s(\\d{1,3})\\r?\\n?$");
     std::regex Parser::re_line_ = std::regex("^LINE\\s(%|PX)\\s(\\d+)\\s(\\d+)\\s(\\d+)\\s(\\d+)(:?\\s\\{(.+)\\})?\\r?\\n?$");
     std::regex Parser::re_circle_ = std::regex("^CIRCLE\\s(%|PX)\\s(\\d+)\\s(\\d+)\\s(\\d+)(:?\\s\\{(.+)\\})?\\r?\\n?$");
@@ -369,6 +369,15 @@ namespace paint
         }
 
         return command;
+    }
+
+    void Parser::RemoveLastCRLF(std::string &line)
+    {
+        if (line.back() == '\n')
+            line.pop_back();
+
+        if (line.back() == '\r')
+            line.pop_back();
     }
 
     std::vector<std::pair<std::string, std::string>> Parser::ParseOptionalArgs(const std::string &opt_args)

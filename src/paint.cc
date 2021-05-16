@@ -118,8 +118,7 @@ To view help write -h or --help, to quit write q
 )!!!";
 
         // Show current line in terminal
-        std::cout
-            << "> ";
+        std::cout << "> ";
 
         while (!exit)
         {
@@ -195,62 +194,120 @@ To view help write -h or --help, to quit write q
 
         file.exceptions(std::ios_base::badbit | std::ios_base::failbit);
 
+        // Open and parse the file
+        bool failed_to_parse_command = false;
+        auto command_counter = 0;
+
         bool exit = false;
         std::string line;
         std::shared_ptr<Command> command;
 
-        while (!exit)
+        try
         {
-            // Read a line
-            std::getline(file, line);
+            file.open(commands_file_path_, std::ios_base::binary | std::ios_base::in);
 
-            // Try parsing the input as command
-            try
+            while (!exit)
             {
-                commands_.emplace_back(std::move(parser_.ParseLine(line)));
+                // Read a line
+                std::getline(file, line);
+
+                parser_.RemoveLastCRLF(line);
+
+                command_counter++;
+
+                // Try parsing the input as command
+                try
+                {
+                    commands_.emplace_back(std::move(parser_.ParseLine(line)));
+                }
+                catch (parse_error &e)
+                {
+                    std::cerr << e.what() << " [" << command_counter << "]: " << e.error_substring() << "\n";
+                    failed_to_parse_command = true;
+                }
             }
-            catch (parse_error &e)
+        }
+        catch (std::ios_base::failure &fail)
+        {
+            if (!file.eof())
             {
-                std::cerr << e.what() << ": '" << e.error_substring() << "'\n";
+                std::cerr << "Error reading commands from file: " << commands_file_path_.string() << std::endl;
+                throw fail;
             }
         }
 
         // No commands entered -> end app
         if (commands_.empty())
+        {
+            std::cerr << "PaintBatch::Run - No commands to apply." << std::endl;
             return;
+        }
+
+        // Ask whether to continue if Painter failed to parse any command
+        if (failed_to_parse_command)
+        {
+            std::cout << "Painter failed to parse some commands. Continue to save? [Y/N]: ";
+            std::string confirmation;
+            std::cin >> confirmation;
+
+            if (confirmation != "Y" && confirmation != "y")
+                return;
+        }
 
         auto load_command = std::dynamic_pointer_cast<LoadCommand>(commands_.front());
         if (!load_command)
         {
             std::cerr << "First command is not LOAD command!" << std::endl;
-            throw "First command is not LOAD command!";
+            return;
         }
 
         // Check file type
         auto file_path = load_command->FilePath();
         auto file_ext = file_path.extension();
-        if (file_ext.string() != ".png" && file_ext.string() != ".bmp")
+        if (file_path.has_filename())
         {
-            std::cerr << "Unknown file type: '" << file_ext.string() << "', " << file_path << std::endl;
-            throw unknown_file_error(file_path);
-        }
-
-        for (auto &dir_entry : std::filesystem::directory_iterator(file_path))
-        {
-            // Try reading all files
-            try
+            if (file_ext.string() != ".png" && file_ext.string() != ".bmp")
             {
-                if (dir_entry.path().extension() == file_ext && dir_entry.is_regular_file())
+                std::cerr << "Unknown file type: '" << file_ext.string() << "', " << file_path << std::endl;
+                throw unknown_file_error(file_path);
+            }
+
+            for (auto &dir_entry : std::filesystem::directory_iterator(file_path))
+            {
+                // Try reading all files
+                try
+                {
+                    if (dir_entry.path().extension() == file_ext && dir_entry.is_regular_file())
+                    {
+                        auto img = CreateImageByExtension(dir_entry.path());
+                        img->LoadImage();
+                        images_.emplace_back(std::move(img));
+                    }
+                }
+                // Unknown file -> do nothing
+                catch (const unknown_file_error &e)
+                {
+                    // Do nothing
+                }
+            }
+        }
+        // LOAD command does not have any filename -> load all supported files in directory, not only specified format
+        else
+        {
+            for (auto &dir_entry : std::filesystem::directory_iterator(file_path))
+            {
+                // Try reading all files
+                try
                 {
                     auto img = CreateImageByExtension(dir_entry.path());
                     img->LoadImage();
                     images_.emplace_back(std::move(img));
                 }
-            }
-            // Unknown file -> do nothing
-            catch (const unknown_file_error &e)
-            {
-                // Do nothing
+                // Unknown file -> do nothing
+                catch (const unknown_file_error &e)
+                {
+                    // Do nothing
+                }
             }
         }
 
@@ -295,9 +352,8 @@ To view help write -h or --help, to quit write q
         }
 
         // Prepare file
-        std::ifstream file(commands_file_path_);
-        if (!file.is_open())
-            perror(("error while opening file: " + commands_file_path_.string()).c_str());
+        std::ifstream file;
+        file.exceptions(std::ios_base::badbit | std::ios_base::failbit | std::ios_base::eofbit);
 
         // Open and parse the file
         bool failed_to_parse_command = false;
@@ -307,31 +363,46 @@ To view help write -h or --help, to quit write q
         std::string line;
         std::shared_ptr<Command> command;
 
-        // Read commands file
-        while (!exit)
+        try
         {
-            // Read a line
-            if (!std::getline(file, line))
-                break;
+            file.open(commands_file_path_, std::ios_base::in);
 
-            command_counter++;
-
-            // Try parsing the input as command
-            try
+            // Read commands file
+            while (!exit)
             {
-                commands_.emplace_back(std::move(parser_.ParseLine(line)));
+                // Read a line
+                std::getline(file, line);
+                // if (!std::getline(file, line))
+                //     break;
+
+                command_counter++;
+
+                // Try parsing the input as command
+                try
+                {
+                    commands_.emplace_back(std::move(parser_.ParseLine(line)));
+                }
+                catch (parse_error &e)
+                {
+                    std::cerr << e.what() << " [" << command_counter << "]: " << e.error_substring() << "\n";
+                    failed_to_parse_command = true;
+                }
             }
-            catch (parse_error &e)
+        }
+        catch (std::ios_base::failure &fail)
+        {
+            // Reached EOF
+            if (!file.eof())
             {
-                std::cerr << e.what() << " [" << command_counter << "]: " << e.error_substring() << "\n";
-                failed_to_parse_command = true;
+                std::cerr << "Error reading commands from file: " << commands_file_path_.string() << std::endl;
+                throw fail;
             }
         }
 
         // Ask whether to continue if Painter failed to parse any command
         if (failed_to_parse_command)
         {
-            std::cout << "Painter failed to parse some commands. Continue to save? [Y/N]" << std::endl;
+            std::cout << "Painter failed to parse some commands. Continue to save? [Y/N]: ";
             std::string confirmation;
             std::cin >> confirmation;
 

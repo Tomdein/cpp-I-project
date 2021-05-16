@@ -55,15 +55,30 @@ namespace paint
 
         virtual void Invoke(Image &im) override
         {
-            if (path_to_file_.empty())
+            // A save location has been given
+            if (!path_to_file_.empty())
             {
-                im.SaveImage();
+                // Only directory is given -> change folderm but not file name
+                if (!path_to_file_.has_filename())
+                {
+                    im.ChangeSaveDirectory(path_to_file_.parent_path());
+                }
+                // A directory and fily type was given -> save in given directory and type
+                else if (path_to_file_.stem().string() == "*")
+                {
+                    // TODO: Add image type conversion support
+                    im.ChangeSaveDirectory(path_to_file_.parent_path());
+                }
+                // Concrete file path and name was given -> save to the specified file
+                else
+                {
+                    im.SaveImage(path_to_file_);
+                    return;
+                }
             }
-            else
-            {
-                im.SaveImage(path_to_file_);
-            }
-        };
+
+            im.SaveImage();
+        }
 
     private:
         std::filesystem::path path_to_file_;

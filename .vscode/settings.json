@@ -2,10 +2,13 @@
     "cmake.debugConfig": {
         // "cwd": "${command:cmake.launchTargetDirectory}",
         "cwd": "${workspaceFolder}",
+        // "args": [
+        //     "drawCzFlagCommands.txt",
+        //     "3000,2000",
+        //     "czFlag.bmp"
+        // ]
         "args": [
-            "drawCzFlagCommands.txt",
-            "3000,2000",
-            "czFlag.bmp"
+            "exampleFileBatchConvert.txt"
         ]
         // "args": [
         //     "drawLineCommand.txt",

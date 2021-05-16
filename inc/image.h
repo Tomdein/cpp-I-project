@@ -52,6 +52,12 @@ namespace paint
         virtual void LoadImage() = 0;
         virtual void SaveImage() = 0;
         virtual void SaveImage(const std::filesystem::path &path) = 0;
+        virtual void ChangeSaveDirectory(const std::filesystem::path &path)
+        {
+            auto file_path_old = std::move(file_out_.file_path_);
+            file_out_.file_path_ = path;
+            file_out_.file_path_ /= file_path_old.filename();
+        }
         void DumpImageHistory();
 
         /**
@@ -102,6 +108,15 @@ namespace paint
         {
             kImageHistorySize = 10,
         };
+
+        void CheckOutputDir()
+        {
+            // Output dir exists -> do nothing
+            if (std::filesystem::exists(file_out_.file_path_.parent_path()))
+                return;
+
+            std::filesystem::create_directories(file_out_.file_path_.parent_path());
+        }
 
     private:
         virtual void CreateDataBuffer() = 0;

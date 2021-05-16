@@ -81,6 +81,8 @@ namespace paint
          */
         static std::shared_ptr<Command> ParseLine(const std::string &line);
 
+        static void RemoveLastCRLF(std::string &line);
+
     private:
         FRIEND_TEST(parser, parse_optional_args); /// Make the Parser::ParseOptionalArgs() and  Painter::ParseColorVal() accessible to google test.
 
