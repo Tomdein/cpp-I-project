@@ -15,6 +15,7 @@
 
 ## GTest (GoogleTest):
 - [GTest GitHub](https://github.com/google/googletest)
+- https://stackoverflow.com/questions/52394031/cmake-error-include-could-not-find-load-file-googletest
   
 ## zlib:
 - [zlib GitHub](https://github.com/madler/zlib)
@@ -24,5 +25,5 @@
 
 ---
 # Commands
-git ls-files | xargs wc -l
-git remote set-url --push origin no_push (disable push)
+- git ls-files | xargs wc -l
+- git remote set-url --push origin no_push (disable push)
