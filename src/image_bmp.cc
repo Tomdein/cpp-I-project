@@ -33,10 +33,10 @@ namespace paint
                 std::ifstream file;
 
                 // Set file to throw exceptions
-                file.exceptions(std::ios_base::failbit | std::ios_base::badbit | std::ios_base::eofbit);
+                file.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 
                 // Open input file
-                file.open(file_in_.file_path_, std::ios::binary);
+                file.open(file_in_.file_path_, std::ios::binary | std::ios::in);
 
                 // Read BMP headers
                 ImageIOBMP::ReadHeaderBMP(file, *this);
@@ -66,8 +66,6 @@ namespace paint
                 // Read the pixel data
                 ImageIOBMP::ReadPixelData(file, *this);
 
-                file.close();
-
                 // Attach data to the image painter
                 painter.AttachImageData(image_data_);
 
@@ -91,10 +89,10 @@ namespace paint
                 std::ofstream file;
 
                 // Set file to throw exceptions
-                file.exceptions(std::ios_base::failbit | std::ios_base::badbit | std::ios_base::eofbit);
+                file.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 
                 // Open output file
-                file.open(file_out_.file_path_, std::ios::binary);
+                file.open(file_out_.file_path_, std::ios::binary | std::ios::out);
 
                 // Write BMP headers
                 ImageIOBMP::WriteHeaderBMP(file, *this);

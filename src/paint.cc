@@ -193,7 +193,7 @@ To view help write -h or --help, to quit write q
 
         std::ifstream file;
 
-        file.exceptions(std::ios_base::badbit | std::ios_base::failbit | std::ios_base::eofbit);
+        file.exceptions(std::ios_base::badbit | std::ios_base::failbit);
 
         bool exit = false;
         std::string line;
