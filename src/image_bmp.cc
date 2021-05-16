@@ -61,7 +61,7 @@ namespace paint
                 CreateDataBuffer();
 
                 // Move to the start of the pixel data
-                file.seekg(header_bmp_.bf_offBits);
+                file.seekg(header_bmp_.bf_offBits, std::ios_base::beg);
 
                 // Read the pixel data
                 ImageIOBMP::ReadPixelData(file, *this);
@@ -74,7 +74,7 @@ namespace paint
             }
             catch (const std::ios_base::failure &fail)
             {
-                std::cout << "Error reading from file: " << file_in_.file_path_.string() << std::endl;
+                std::cerr << "Error reading from file: " << file_in_.file_path_.string() << std::endl;
                 throw fail;
             }
         }
@@ -83,6 +83,8 @@ namespace paint
         {
             // Renew the headers
             GenerateMetadata();
+
+            CheckOutputDir();
 
             try
             {

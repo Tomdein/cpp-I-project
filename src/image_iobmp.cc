@@ -68,6 +68,7 @@ namespace paint
                 const uint8_t pixel_mask = std::pow(2, image.header_bmp_info_.bi_bitCount) - 1; // Mask for the pixel
                 uint8_t mask;                                                                   // Mask shifted to the right position
                 int pos;                                                                        // Position of the byte
+                int pos_in_byte;                                                                // Position of the pixel inside of byte
                 uint8_t pixel;                                                                  // Value of the pixel after applying mask
 
                 // For each row
@@ -77,11 +78,15 @@ namespace paint
                     for (size_t x = 0; x < image.header_bmp_info_.bi_width; x++)
                     {
                         // Calculate byte position
-                        pos = x / image.header_bmp_info_.bi_bitCount;
+                        pos = x / (8 / image.header_bmp_info_.bi_bitCount);
+                        // Calculate starting position of pixel inside byte
+                        pos_in_byte = x % (8 / image.header_bmp_info_.bi_bitCount);
                         // Shift the mask
-                        mask = pixel_mask << (x % image.header_bmp_info_.bi_bitCount);
+                        mask = pixel_mask << ((8 - image.header_bmp_info_.bi_bitCount) - pos_in_byte * image.header_bmp_info_.bi_bitCount);
                         // Get the value
-                        pixel = image.unprocessed_data.get()[y * data_width_bytes + pos] & mask;
+                        pixel = image.unprocessed_data.get()[y * (data_width_bytes + four_byte_align) + pos] & mask;
+                        // Normalize the pixel
+                        pixel = pixel >> ((8 - image.header_bmp_info_.bi_bitCount) - pos_in_byte * image.header_bmp_info_.bi_bitCount);
 
                         // Set the value in data at (x, y)
                         *reinterpret_cast<uint8_t *>(image.image_data_->at(x, y)) = pixel;
